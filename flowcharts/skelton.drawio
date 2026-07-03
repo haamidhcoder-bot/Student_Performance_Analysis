@@ -1,0 +1,16 @@
+<mxfile host="65bd71144e">
+    <diagram id="medwHarglt3djs0zo0ud" name="Page-1">
+        <mxGraphModel dx="804" dy="330" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="Needed HTML Webpages&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;login page&lt;/div&gt;&lt;div&gt;selecting class and section&lt;/div&gt;&lt;div&gt;displaying students and marks&lt;/div&gt;&lt;div&gt;displaying statistical data of students when selected&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry width="180" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Needed Database Tables&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;containing login credentials of teachers&lt;/div&gt;&lt;div&gt;containing details of class and sections and students&lt;/div&gt;&lt;div&gt;containing marks of each exam&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="170" width="180" height="120" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
