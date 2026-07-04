@@ -1,6 +1,8 @@
 try:
     import random
     import mysql.connector as sql
+    from person_names_720 import person_names
+    import random
 
     # Update these if needed
     DB_CONFIG = {
@@ -54,15 +56,17 @@ try:
     subjects_11_12 = ["English", "Maths", "Physics", "Chemistry", "Computer"]
 
     # Students and marks
+    sections={"A":1,"B":2,"C":3}
     for cls in range(1, 13):
-        for i in range(1, 21):
-            roll_no = cls * 100 + i
-            name = f"Student_{cls}_{i}"
+        for sec in sections:
+            for i in range(1, 21):
+                roll_no = int(f"{cls}{sections[sec]}00") + i
+                name = random.choice(person_names)
 
-            cur.execute(
-                "INSERT INTO students(roll_no, student_name, class, section) VALUES(%s,%s,%s,%s)",
-                (roll_no, name, cls, "A")
-            )
+                cur.execute(
+                    "INSERT INTO students(roll_no, student_name, class, section) VALUES(%s,%s,%s,%s)",
+                    (roll_no, name, cls, sec)
+                )
 
             subjects = subjects_1_10 if cls <= 10 else subjects_11_12
 
@@ -81,3 +85,4 @@ try:
 
 except Exception as e:
     print(f"ERROR:{e}")
+
