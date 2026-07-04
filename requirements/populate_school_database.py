@@ -12,7 +12,7 @@ try:
     conn = sql.connect(**DB_CONFIG)
     cur = conn.cursor()
 
-    with open(r"C:\Users\dell\Desktop\Student_Performance_Analysis\requirements\school_database_schema.sql") as f:
+    with open("./requirements/school_database_schema.sql") as f:
         queries=f.read()
 
     # Split statements using ';'
