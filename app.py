@@ -35,62 +35,13 @@ class Student(db.Model):
     student_name = db.Column(db.String(100), nullable=False)
     student_class = db.Column("class", db.Integer, nullable=False)
     section = db.Column(db.String(1), nullable=False)
-
-    marks = db.relationship(
-        "Mark",
-        backref="student",
-        cascade="all, delete",
-        lazy=True
-    )
+    subject=db.Column(db.String(10))
+    marks=db.column(db.Integer)
 
     def __repr__(self):
         return f"<Student {self.roll_no} - {self.student_name}>"
 
 
-
-class Exam(db.Model):
-    __tablename__ = "exams"
-
-    exam_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    exam_name = db.Column(db.String(50), nullable=False)
-
-    marks = db.relationship(
-        "Mark",
-        backref="exam",
-        cascade="all, delete",
-        lazy=True
-    )
-
-    def __repr__(self):
-        return f"<Exam {self.exam_name}>"
-
-
-
-class Mark(db.Model):
-    __tablename__ = "marks"
-
-    roll_no = db.Column(
-        db.Integer,
-        db.ForeignKey("students.roll_no", ondelete="CASCADE"),
-        primary_key=True
-    )
-
-    exam_id = db.Column(
-        db.Integer,
-        db.ForeignKey("exams.exam_id", ondelete="CASCADE"),
-        primary_key=True
-    )
-
-    subject = db.Column(db.String(50), primary_key=True)
-    marks = db.Column(db.Integer, nullable=False)
-
-    def __repr__(self):
-        return (
-            f"<Mark Roll:{self.roll_no} "
-            f"Exam:{self.exam_id} "
-            f"Subject:{self.subject} "
-            f"Marks:{self.marks}>"
-        )
 @app.route("/",methods=["post","get"])
 def login_page():    
         users=Teacher.query.all()
@@ -102,9 +53,26 @@ def login_page():
                     return render_template("Home.html")
         return render_template("login_page.html")
 
-@app.route("/Home",methods=["post","get"])
-def Home():
-    pass
+@app.route("/data", methods=["GET", "POST"])
+def data():
+    if request.method == "POST":
+        class_value = request.form.get("class", "").strip()
+        sec = request.form.get("section", "").strip()
+
+        if class_value:
+            class_value = int(class_value)
+            students = Student.query.filter(
+                Student.student_class == class_value,
+                Student.section == sec
+            ).all()
+
+            if students:
+                return render_template("Student_data.html", class_value=class_value,students=students)
+
+        return render_template("Home.html", error="No matching students found.")
+
+    return render_template("Home.html")
+
 
 
 if __name__ == "__main__":

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis</title>
+</head>
+<body>
+    
+    <label for="subject">Subject</label>
+    {%if class_value<=10%}
+    <select name="subject10" id="sub1">
+        <option value="English">English</option>
+        <option value="Math">Math</option>
+        <option value="Social">Social</option>
+        <option value="Science">Science</option>
+        <option value="Tamil">Tamil</option>
+        <option value="All Subjects">All Subjects</option>
+    </select>
+    {%else%}
+    <select name="subject12" id="sub2">
+        <option value="English">English</option>
+        <option value="Math">Math</option>
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Biology">Biology</option>
+        <option value="All Subjects">All Subjects</option>
+    </select>
+    {%endif%}
+</body>
+</html>

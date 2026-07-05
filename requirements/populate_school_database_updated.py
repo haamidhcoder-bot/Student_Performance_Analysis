@@ -14,7 +14,7 @@ try:
     conn = sql.connect(**DB_CONFIG)
     cur = conn.cursor()
 
-    with open("./requirements/school_database_schema.sql") as f:
+    with open("./requirements/school_database_schema_updated.sql") as f:
         queries=f.read()
 
     # Split statements using ';'
@@ -39,44 +39,18 @@ try:
         teachers
     )
 
-    # Exams
-    exam_names = [
-        "Unit Test 1",
-        "Quarterly Exam",
-        "Half Yearly Exam",
-        "Unit Test 2",
-        "Annual Exam"
-    ]
-    cur.executemany(
-        "INSERT INTO exams(exam_name) VALUES(%s)",
-        [(e,) for e in exam_names]
-    )
-
     subjects_1_10 = ["English", "Maths", "Social", "Science", "Tamil"]
     subjects_11_12 = ["English", "Maths", "Physics", "Chemistry", "Computer"]
 
-    # Students and marks
+    # Students
     sections={"A":1,"B":2,"C":3}
-    for cls in range(1, 13):
+    for cls in range(1,13):
+        subjects=subjects_1_10 if cls<=10 else subjects_11_12
         for sec in sections:
-            for i in range(1, 21):
-                roll_no = int(f"{cls}{sections[sec]}00") + i
-                name = random.choice(person_names)
-
-                cur.execute(
-                    "INSERT INTO students(roll_no, student_name, class, section) VALUES(%s,%s,%s,%s)",
-                    (roll_no, name, cls, sec)
-                )
-
-            subjects = subjects_1_10 if cls <= 10 else subjects_11_12
-
-            for exam_id in range(1, 6):
-                for subject in subjects:
-                    mark = random.randint(35, 100)
-                    cur.execute(
-                        "INSERT INTO marks(roll_no, exam_id, subject, marks) VALUES(%s,%s,%s,%s)",
-                        (roll_no, exam_id, subject, mark)
-                    )
+            for i in range(1,21):
+                roll_no=int(f"{cls}{sections[sec]}00")+i
+                name=random.choice(person_names)
+                cur.execute("INSERT INTO students(roll_no, student_name, class, section) VALUES(%s,%s,%s,%s)",(roll_no,name,cls,sec))
 
     conn.commit()
     conn.close()
