@@ -23,10 +23,6 @@ class Teacher(db.Model):
     username = db.Column(db.String(50), primary_key=True)
     password = db.Column(db.String(255), nullable=False)
 
-    def __repr__(self):
-        return f"<Teacher {self.username}>"
-
-
 
 class Student(db.Model):
     __tablename__ = "students"
@@ -35,12 +31,38 @@ class Student(db.Model):
     student_name = db.Column(db.String(100), nullable=False)
     student_class = db.Column("class", db.Integer, nullable=False)
     section = db.Column(db.String(1), nullable=False)
-    subject=db.Column(db.String(10))
-    marks=db.column(db.Integer)
 
-    def __repr__(self):
-        return f"<Student {self.roll_no} - {self.student_name}>"
 
+class Exam(db.Model):
+    __tablename__ = "exams"
+
+    exam_id = db.Column(db.Integer, primary_key=True)
+    exam_name = db.Column(db.String(50), unique=True, nullable=False)
+
+
+class Mark(db.Model):
+    __tablename__ = "marks"
+
+    roll_no = db.Column(
+        db.Integer,
+        db.ForeignKey("students.roll_no"),
+        primary_key=True
+    )
+
+    student_class= db.Column(
+        "class", db.Integer,
+        nullable=False
+    )
+
+    exam_id = db.Column(
+        db.Integer,
+        db.ForeignKey("exams.exam_id"),
+        primary_key=True
+    )
+
+    subject = db.Column(db.String(30), primary_key=True)
+
+    marks = db.Column(db.Integer)
 
 @app.route("/",methods=["post","get"])
 def login_page():    
@@ -65,14 +87,25 @@ def data():
                 Student.student_class == class_value,
                 Student.section == sec
             ).all()
-
+            res = Mark.query.filter(
+                Mark.student_class == class_value
+            ).all()
+            
             if students:
-                return render_template("Student_data.html", class_value=class_value,students=students)
+                return render_template("Student_data.html", class_value=class_value,students=students,results=res)
 
         return render_template("Home.html", error="No matching students found.")
 
     return render_template("Home.html")
 
+@app.route("/refresh")
+def refresh():
+    if request.method=="get":
+        sub=request.form.get("{%if %}")
+
+@app.route("/mark",methods=["POST","GET"])
+def mark():
+    return render_template("student_data.html")
 
 
 if __name__ == "__main__":
