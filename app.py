@@ -1,6 +1,5 @@
-from flask import Flask,render_template,redirect,request
+from flask import Flask,render_template,redirect,request,session
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 import mysql.connector as sql
 
 cn = sql.connect(host='127.0.0.1', user='root', password="pass12345")
@@ -10,6 +9,8 @@ cr.execute("create database if not exists schooldb")
 
 app=Flask(__name__)
 
+
+app.secret_key = "some-random-secret-string"  # required for sessions to work
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     "mysql+pymysql://root:pass12345@localhost/schooldb"#format for using mysql
@@ -66,13 +67,15 @@ class Mark(db.Model):
 
 @app.route("/",methods=["post","get"])
 def login_page():    
-        users=Teacher.query.all()
         if request.method=="POST":
-            user_n=request.form.get("username")
-            pass_n=request.form.get("password")
-            for teacher in users:
-                if teacher.username==user_n and teacher.password==pass_n:
-                    return render_template("Home.html")
+            user_n=request.form.get("username","")
+            pass_n=request.form.get("password","")
+            teachers=Teacher.query.filter(
+                Teacher.username==user_n,
+                Teacher.password==pass_n
+            ).first()
+            if teachers:
+                return render_template("Home.html")
         return render_template("login_page.html")
 
 @app.route("/data", methods=["GET", "POST"])
@@ -82,30 +85,54 @@ def data():
         sec = request.form.get("section", "").strip()
 
         if class_value:
-            class_value = int(class_value)
+            try:
+                class_value = int(class_value.strip("-"))
+            except:
+                return render_template("Home.html", error="Invalid class value.")
+            session["class_value"] =class_value
+            session["sec"]=sec
             students = Student.query.filter(
                 Student.student_class == class_value,
                 Student.section == sec
             ).all()
-            res = Mark.query.filter(
-                Mark.student_class == class_value
-            ).all()
-            
             if students:
-                return render_template("Student_data.html", class_value=class_value,students=students,results=res)
+                return render_template("Student_data.html", class_value=class_value)
 
         return render_template("Home.html", error="No matching students found.")
 
     return render_template("Home.html")
 
-@app.route("/refresh")
+@app.route("/refresh", methods=["GET", "POST"])
 def refresh():
-    if request.method=="get":
-        sub=request.form.get("{%if %}")
+    class_value=session.get("class_value")
+    sec=session.get("sec")
+    if request.method == "POST" and class_value!=None:
+        sub = request.form.get("subject10","") if class_value <= 10 else request.form.get("subject12","")
+        exa = request.form.get("exam10","") or request.form.get("exam12","")
+        sub1=sub if sub!="" else ""
+        exa1= exa if exa!="" else ""
+        students = Student.query.filter(
+                Student.student_class == class_value,
+                Student.section == sec
+        ).all()
+        exam = Exam.query.filter(
+            Exam.exam_name == exa1 
+        ).first()
+        res = []
+        if exam is not None:
+            res = Mark.query.filter(
+                Mark.student_class == class_value,
+                Mark.exam_id == exam.exam_id,
+                Mark.subject == sub1 
+            ).all() if sub!="All" else Mark.query.all()
+
+        if sub:
+            return render_template("Student_data.html", class_value=class_value, students=students, results=res)
+    return redirect("/data")
 
 @app.route("/mark",methods=["POST","GET"])
 def mark():
-    return render_template("student_data.html")
+    return render_template("Student_data.html")
 
 
 if __name__ == "__main__":

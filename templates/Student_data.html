@@ -7,7 +7,7 @@
 </head>
 <body>
     <nav>
-        <a href="#" class="logo">Study Performance Analysis/a>
+        <a href="#" class="logo">Study Performance Analysis</a>
         <ul>
             <li><a href="Home.html">Home</a></li>
             <li><a href="#">Student Data</a></li>
@@ -15,22 +15,21 @@
             <li><a href="#">About us</a></li>
         </ul>
       </nav>
-    <form action="/refresh" method="get">
+    <form action="/refresh" method="POST">
         <button type="submit" style="float: right;">⟳</button>
-        <form action="/mark"  method="POST">
-            <label for="subject">Subject</label>
             {%if class_value<=10%}
+            <label for="subject10">Subject</label>
             <select name="subject10" id="sub1">
                 <option value=""> Select Subject </option>
                 <option value="English">English</option>
-                <option value="Math">Math</option>
+                <option value="Maths">Maths</option>
                 <option value="Social">Social</option>
                 <option value="Science">Science</option>
                 <option value="Tamil">Tamil</option>
-                <option value="All Subjects">All Subjects</option>
+                <option value="All">All Subjects</option>
             </select><br>
-            <label for="Exam">Exam</label>
-            <select name="exam" id="exam" >
+            <label for="exam10">Exam</label>
+            <select name="exam10" id="exam" >
                 <option value=""> Select Exam </option>
                 <option value="Unit Test 1">Unit Test 1</option>
                 <option value="Quarterly Exam">Quarterly Exam</option>
@@ -49,22 +48,24 @@
             <td>{{stu.roll_no}}</td>
             <td>{{stu.student_name}}</td>
             {%for mark in results%}
-            
+            {%if mark.roll_no==stu.roll_no%}
+            <td>{{mark.marks}}</td>
+            {%endif%}
+            {%endfor%}
         </tr>
         {%endfor%}
     </table>
     {%else%}
     <select name="subject12" id="sub2">
         <option value="English">English</option>
-        <option value="Math">Math</option>
+        <option value="Maths">Maths</option>
         <option value="Physics">Physics</option>
         <option value="Chemistry">Chemistry</option>
         <option value="Biology">Biology</option>
-        <option value="All Subjects">All Subjects</option>
+        <option value="All">All Subjects</option>
     </select>
     {%endif%}
     <button type="submit">Submit</button>
-</form>
 </form>
 </body>
 </html>
