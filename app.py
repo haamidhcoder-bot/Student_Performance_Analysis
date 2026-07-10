@@ -1,6 +1,7 @@
 from flask import Flask,render_template,redirect,request,session
 from flask_sqlalchemy import SQLAlchemy
 import mysql.connector as sql
+from sqlalchemy import func
 
 cn = sql.connect(host='127.0.0.1', user='root', password="pass12345")
 cr = cn.cursor()
@@ -63,7 +64,7 @@ class Mark(db.Model):
 
     subject = db.Column(db.String(30), primary_key=True)
 
-    marks = db.Column(db.Integer)
+    marks = db.Column(db.Integer,default=0)
 
 @app.route("/",methods=["post","get"])
 def login_page():    
@@ -96,7 +97,7 @@ def data():
                 Student.section == sec
             ).all()
             if students:
-                return render_template("Student_data.html", class_value=class_value)
+                return render_template("Student_data.html", class_value=class_value,sub="")
 
         return render_template("Home.html", error="No matching students found.")
 
@@ -109,8 +110,8 @@ def refresh():
     if request.method == "POST" and class_value!=None:
         sub = request.form.get("subject10","") if class_value <= 10 else request.form.get("subject12","")
         exa = request.form.get("exam10","") or request.form.get("exam12","")
-        sub1=sub if sub!="" else ""
-        exa1= exa if exa!="" else ""
+        sub1=sub 
+        exa1= exa
         students = Student.query.filter(
                 Student.student_class == class_value,
                 Student.section == sec
@@ -124,10 +125,22 @@ def refresh():
                 Mark.student_class == class_value,
                 Mark.exam_id == exam.exam_id,
                 Mark.subject == sub1 
-            ).all() if sub!="All" else Mark.query.all()
+            ).all() 
 
+        if sub == "All":
+            #provided by ai assistant-- own idea was slow due to multiple iteration
+            totals = db.session.query(
+                Mark.roll_no,
+                func.sum(Mark.marks).label("total")
+            ).filter(
+                Mark.student_class == class_value,
+                Mark.exam_id == exam.exam_id
+            ).group_by(Mark.roll_no).all()
+
+            total_marks = {row.roll_no: row.total for row in totals}
+            return render_template("Student_data.html", class_value=class_value, students=students, total_marks=total_marks)        
         if sub:
-            return render_template("Student_data.html", class_value=class_value, students=students, results=res)
+            return render_template("Student_data.html", class_value=class_value, students=students, results=res,sub=sub)
     return redirect("/data")
 
 @app.route("/mark",methods=["POST","GET"])

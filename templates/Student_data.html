@@ -15,10 +15,11 @@
             <li><a href="#">About us</a></li>
         </ul>
       </nav>
-    <form action="/refresh" method="POST">
-        <button type="submit" style="float: right;">⟳</button>
-            {%if class_value<=10%}
-            <label for="subject10">Subject</label>
+    <form action="/refresh" method="POST" >
+        <button type="submit" style="display:inline; float:right;">⟳</button>
+        
+        {% if class_value <= 10 %}
+        <label for="subject10">Subject</label>
             <select name="subject10" id="sub1">
                 <option value=""> Select Subject </option>
                 <option value="English">English</option>
@@ -37,6 +38,8 @@
                 <option value="Unit Test 2">Unit Test 2</option>
         <option value="Annual Exam">Annual Exam</option>
     </select><br>
+
+    {% if sub!="All" and sub!=""%}
     <table border="2px">
         <thead>
             <tr>
@@ -57,17 +60,39 @@
         </tr>
         {%endfor%}
     </table>
-    {%else%}
+    {% elif sub=="All"%}
+    <table border="2px">
+        <thead>
+            <tr>
+                <th>Roll no</th>
+                <th>Student name</th>
+                <th>Marks</th>
+            </tr>
+        </thead>
+        {%for stu in students%}
+        <tr>
+            <td>{{stu.roll_no}}</td>
+            <td>{{stu.student_name}}</td>
+            <td>{{ total_marks.get(stu.roll_no, '') }}</td>
+        </tr>
+        {%endfor%}
+    </table>
+
+    {% else %}
+        <h4>There are no data to show</h4>
+    {% endif %}
+    {% else %}
     <select name="subject12" id="sub2">
-        <option value="English">English</option>
-        <option value="Maths">Maths</option>
-        <option value="Physics">Physics</option>
-        <option value="Chemistry">Chemistry</option>
-        <option value="Biology">Biology</option>
-        <option value="All">All Subjects</option>
-    </select>
-    {%endif%}
-    <button type="submit">Submit</button>
-</form>
+                <option value="English">English</option>
+                <option value="Maths">Maths</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Biology">Biology</option>
+                <option value="All">All Subjects</option>
+            </select>
+            {% endif %}
+            
+    </form>
+    <button type="button">Submit</button>
 </body>
 </html>

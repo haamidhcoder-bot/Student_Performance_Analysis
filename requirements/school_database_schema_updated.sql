@@ -41,7 +41,7 @@ CREATE TABLE marks (
     class INT NOT NULL,
     exam_id INT NOT NULL,
     subject VARCHAR(30) NOT NULL,
-    marks INT,
+    marks INT DEFAULT 0,
 
     PRIMARY KEY (roll_no, exam_id, subject),
 
