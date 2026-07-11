@@ -77,6 +77,8 @@ def login_page():
             ).first()
             if teachers:
                 return render_template("Home.html")
+            else:
+                return render_template("Error.html",data=" incorrect username or password")
         return render_template("login_page.html")
 
 @app.route("/data", methods=["GET", "POST"])
@@ -87,7 +89,7 @@ def data():
 
         if class_value:
             try:
-                class_value = int(class_value.strip("-"))
+                class_value = int(class_value)
             except:
                 return render_template("Home.html", error="Invalid class value.")
             session["class_value"] =class_value
@@ -105,30 +107,26 @@ def data():
 
 @app.route("/refresh", methods=["GET", "POST"])
 def refresh():
-    class_value=session.get("class_value")
-    sec=session.get("sec")
-    if request.method == "POST" and class_value!=None:
-        sub = request.form.get("subject10","") if class_value <= 10 else request.form.get("subject12","")
-        exa = request.form.get("exam10","") or request.form.get("exam12","")
-        sub1=sub 
-        exa1= exa
+    class_value = session.get("class_value")
+    sec = session.get("sec")
+    if request.method == "POST" and class_value is not None:
+        sub = request.form.get("subject10", "") or request.form.get("subject12", "")
+        exa = request.form.get("exam10", "") or request.form.get("exam12", "")
         students = Student.query.filter(
-                Student.student_class == class_value,
-                Student.section == sec
+            Student.student_class == class_value,
+            Student.section == sec
         ).all()
-        exam = Exam.query.filter(
-            Exam.exam_name == exa1 
-        ).first()
+
+        exam = Exam.query.filter(Exam.exam_name == exa).first() if exa else None
         res = []
-        if exam is not None:
+        if exam is not None and sub and exa:
             res = Mark.query.filter(
                 Mark.student_class == class_value,
                 Mark.exam_id == exam.exam_id,
-                Mark.subject == sub1 
-            ).all() 
+                Mark.subject == sub
+            ).all()
 
-        if sub == "All":
-            #provided by ai assistant-- own idea was slow due to multiple iteration
+        if sub == "All" and exam is not None:
             totals = db.session.query(
                 Mark.roll_no,
                 func.sum(Mark.marks).label("total")
@@ -138,9 +136,24 @@ def refresh():
             ).group_by(Mark.roll_no).all()
 
             total_marks = {row.roll_no: row.total for row in totals}
-            return render_template("Student_data.html", class_value=class_value, students=students, total_marks=total_marks)        
-        if sub:
-            return render_template("Student_data.html", class_value=class_value, students=students, results=res,sub=sub)
+            return render_template(
+                "Student_data.html",
+                class_value=class_value,
+                students=students,
+                total_marks=total_marks,
+                sub=sub,
+                exam=exa
+            )
+
+        if sub and exa:
+            return render_template(
+                "Student_data.html",
+                class_value=class_value,
+                students=students,
+                results=res,
+                sub=sub,
+                exam=exa
+            )
     return redirect("/data")
 
 @app.route("/mark",methods=["POST","GET"])
