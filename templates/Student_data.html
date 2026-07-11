@@ -87,6 +87,7 @@
                     <th>Roll no</th>
                     <th>Student name</th>
                     <th>Marks</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             {% for stu in students %}
@@ -96,6 +97,11 @@
                 {% for mark in results %}
                 {% if mark.roll_no == stu.roll_no %}
                 <td>{{ mark.marks }}</td>
+                <td>
+                    <button type="button" class="del-btn" data-roll="{{ mark.roll_no }}">Delete</button>
+                    <script src="{{ url_for('static', filename='delete.js') }}"></script><!--js for delete is incomplete do after learning-->
+                    <a href="/edit/{{mark.roll_no}}/{{mark.subject}}">Edit</a>  
+                </td>
                 {% endif %}
                 {% endfor %}
             </tr>
@@ -105,6 +111,5 @@
         <h4>There are no data to show</h4>
         {% endif %}
     </form>
-    <button type="button">Submit</button>
 </body>
 </html>

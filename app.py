@@ -78,7 +78,7 @@ def login_page():
             if teachers:
                 return render_template("Home.html")
             else:
-                return render_template("Error.html",data=" incorrect username or password")
+                return render_template("Error.html",data=" incorrect username or password",location="/")
         return render_template("login_page.html")
 
 @app.route("/data", methods=["GET", "POST"])
@@ -154,13 +154,43 @@ def refresh():
                 sub=sub,
                 exam=exa
             )
+        elif sub=="" and exa=="":
+            return render_template("Error.html",data="select the subject and exam",location="/data")
+    
     return redirect("/data")
 
-@app.route("/mark",methods=["POST","GET"])
-def mark():
-    return render_template("Student_data.html")
+
+@app.route("/delete/<int:roll_no>")
+def delete(roll_no:int):
+    delete_student=Student.query.get_or_404(roll_no)
+    try:
+        db.session.delete(delete_student)#deleting data
+        db.session.commit()#commiting it
+        return redirect("/data")#back to home
+    except Exception as e:
+        print(f"ERROR {e}")
+        return redirect("/data")
 
 
+@app.route("/edit/<int:roll_no>/<string:subject>", methods=["POST", "GET"])
+def edit(roll_no:int, subject:str):
+    mark=Mark.query.filter(
+        Mark.roll_no==roll_no,
+        Mark.subject==subject
+        ).first()
+    if request.method=="POST" and mark:
+        mar=request.form["content"]#to get info from input box 
+        mark.marks=mar
+        try:
+            db.session.commit()#commiting it
+            return redirect("/data")#back to home
+        except Exception as e:
+            print(f"ERROR {e}")
+            return redirect("/")
+        #create a new task
+    else:
+        return render_template("edit.html",marks=mark)
+    
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
