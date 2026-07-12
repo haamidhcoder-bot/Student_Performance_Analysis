@@ -63,7 +63,7 @@
         {% endif %}
 
         {% if sub == "All" %}
-        <h1></h1>
+        <h4>All subjects--{{exam}}</h4>
         <table border="2px">
             <thead>
                 <tr>
@@ -81,6 +81,7 @@
             {% endfor %}
         </table>
         {% elif sub %}
+        <h4>{{sub}}--{{exam}}</h4>
         <table border="2px">
             <thead>
                 <tr>
@@ -98,9 +99,8 @@
                 {% if mark.roll_no == stu.roll_no %}
                 <td>{{ mark.marks }}</td>
                 <td>
-                    <button type="button" class="del-btn" data-roll="{{ mark.roll_no }}">Delete</button>
-                    <script src="{{ url_for('static', filename='delete.js') }}"></script><!--js for delete is incomplete do after learning-->
-                    <a href="/edit/{{mark.roll_no}}/{{mark.subject}}">Edit</a>  
+                    <a href="/graph/{{mark.roll_no}}/{{mark.subject}}/{{mark.exam_id}}">Graph analysis</a><br>
+                    <a href="/edit/{{mark.roll_no}}/{{mark.subject}}/{{mark.exam_id}}">Edit</a>  
                 </td>
                 {% endif %}
                 {% endfor %}

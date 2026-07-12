@@ -2,6 +2,8 @@ from flask import Flask,render_template,redirect,request,session
 from flask_sqlalchemy import SQLAlchemy
 import mysql.connector as sql
 from sqlalchemy import func
+import matplotlib.pyplot as plt
+import numpy as np
 
 cn = sql.connect(host='127.0.0.1', user='root', password="pass12345")
 cr = cn.cursor()
@@ -159,24 +161,12 @@ def refresh():
     
     return redirect("/data")
 
-
-@app.route("/delete/<int:roll_no>")
-def delete(roll_no:int):
-    delete_student=Student.query.get_or_404(roll_no)
-    try:
-        db.session.delete(delete_student)#deleting data
-        db.session.commit()#commiting it
-        return redirect("/data")#back to home
-    except Exception as e:
-        print(f"ERROR {e}")
-        return redirect("/data")
-
-
-@app.route("/edit/<int:roll_no>/<string:subject>", methods=["POST", "GET"])
-def edit(roll_no:int, subject:str):
+@app.route("/edit/<int:roll_no>/<string:subject>/<int:exam_id>", methods=["POST", "GET"])
+def edit(roll_no:int, subject:str,exam_id:int):
     mark=Mark.query.filter(
         Mark.roll_no==roll_no,
-        Mark.subject==subject
+        Mark.subject==subject,
+        Mark.exam_id==exam_id
         ).first()
     if request.method=="POST" and mark:
         mar=request.form["content"]#to get info from input box 
@@ -190,6 +180,59 @@ def edit(roll_no:int, subject:str):
         #create a new task
     else:
         return render_template("edit.html",marks=mark)
+    
+@app.route("/graph/<int:roll_no>/<string:subject>/<int:exam_id>", methods=["POST", "GET"])
+def graph(roll_no:int, subject:str,exam_id:int):
+    if subject:
+        exam_all=Exam.query.all()
+        res = Mark.query.filter(
+                Mark.student_class == session.get("class_value"),
+                Mark.exam_id == exam_id,
+                Mark.subject == subject
+            ).all()
+                    
+        students = Student.query.filter(
+            Student.student_class == session.get("class_value"),
+            Student.section == session.get("sec")
+        ).all()
+
+        mark=Mark.query.filter(
+                Mark.roll_no==roll_no,
+                Mark.subject==subject
+                ).all()
+        
+        exam = Exam.query.filter(Exam.exam_id==exam_id).first()
+        exam1=exam.exam_name
+
+
+        list_cont=dict(marker=".",markersize=10,
+         markerfacecolor="red",
+         markeredgecolor="red",
+         linestyle="dashed",
+         linewidth=2)
+        
+        x_axis,y_axis=np.array([exa.exam_name for exa in exam_all]),np.array([mar.marks for mar in mark ])
+
+        plt.plot(x_axis,y_axis,color="red",**list_cont)
+
+        plt.xlabel("Exams",color="green",fontweight="bold")
+        plt.ylabel("Marks",color="green",fontweight="bold")
+
+        plt.tick_params(axis="both",colors="blue")
+
+        plt.grid(linestyle="dashed")#to form a grid 
+
+        plt.title("Mark analysis",fontsize=12,color="blue",fontweight="bold")
+        plt.show()
+
+        return render_template("Student_data.html", 
+                               class_value=session.get("class_value"),
+                               students=students,
+                               results=res,
+                               sub=subject,
+                               exam=exam1) 
+
+
     
 if __name__ == "__main__":
     with app.app_context():
