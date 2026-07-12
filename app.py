@@ -319,7 +319,15 @@ def graph(roll_no:int, subject:str,exam_id:int):
 @app.route("/about")
 def about():
     return render_template("about_us.html")
+
+@app.route("/support")
+def support():
+    return render_template("support.html")
     
+@app.route("/leaderboard")
+def leaderboard():
+    return render_template("leaderboard.html")
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

@@ -10,9 +10,9 @@
     <div class="navbar">
         <div class="brand">SCHOOL PERFORMANCE ANALYSIS</div>
         <nav>
-          <a href="/data" class="active">Home</a>
-          <a href="#">History</a>
-          <a href="/about">About us</a>
+          <a href="/data" class="{%if request.path=='/data'%}active{%endif%}">Home</a>
+          <a href="/leaderboard" class="{%if request.path=='/leaderboard'%}active{%endif%}">leaderboard</a>
+          <a href="/about" class="{%if request.path=='/about'%}active{%endif%}">About us</a>
         </nav>
       </div>
     <div class="container">
