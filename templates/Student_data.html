@@ -11,7 +11,6 @@
         <div class="brand">SCHOOL PERFORMANCE ANALYSIS</div>
         <nav>
           <a href="/data" class="{%if request.path=='/data'%}active{%endif%}">Home</a>
-          <a href="/leaderboard" class="{%if request.path=='/leaderboard'%}active{%endif%}">leaderboard</a>
           <a href="/about" class="{%if request.path=='/about'%}active{%endif%}">About us</a>
         </nav>
       </div>
@@ -93,9 +92,9 @@
             <tbody>
             {% for stu in students %}
             <tr>
-                <td data-label="Roll no">{{ stu.roll_no }}</td>
-                <td data-label="Student name">{{ stu.student_name }}</td>
-                <td data-label="Marks" class="total-marks">{{ total_marks.get(stu.roll_no, '') }}</td>
+                <td data-label="Roll no" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ stu.roll_no }}</td>
+                <td data-label="Student name" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ stu.student_name }}</td>
+                <td data-label="Marks" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ total_marks.get(stu.roll_no, '') }}</td>
             </tr>
             {% endfor %}
             </tbody>
@@ -112,21 +111,21 @@
                 </tr>
             </thead>
             <tbody>
-            {% for stu in students %}
-            <tr>
-                <td data-label="Roll no">{{ stu.roll_no }}</td>
-                <td data-label="Student name">{{ stu.student_name }}</td>
-                {% for mark in results %}
-                {% if mark.roll_no == stu.roll_no %}
-                <td data-label="Marks">{{ mark.marks }}</td>
-                <td data-label="Actions" class="actions">
-                    <a href="/graph/{{mark.roll_no}}/{{mark.subject}}/{{mark.exam_id}}">Graph analysis</a>
-                    <a href="/edit/{{mark.roll_no}}/{{mark.subject}}/{{mark.exam_id}}">Edit</a>
-                </td>
-                {% endif %}
+                {% for stu in students %}
+                    {% for mark in results %}
+                    {% if mark.roll_no == stu.roll_no %}
+                    <tr>
+                        <td data-label="Roll no" class="{% if mark.marks <= 30 %}fail{% endif %}">{{ stu.roll_no }}</td>
+                        <td data-label="Student name" class="{% if mark.marks <= 30 %}fail{% endif %}">{{ stu.student_name }}</td>
+                        <td data-label="Marks" class="{% if mark.marks <= 30 %}fail{% endif %}">{{ mark.marks }}</td>
+                        <td data-label="Actions" class="actions">
+                            <a href="/graph/{{ mark.roll_no }}/{{ mark.subject }}/{{ mark.exam_id }}">Graph analysis</a>
+                            <a href="/edit/{{ mark.roll_no }}/{{ mark.subject }}/{{ mark.exam_id }}">Edit</a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
                 {% endfor %}
-            </tr>
-            {% endfor %}
             </tbody>
         </table>
         {% else %}

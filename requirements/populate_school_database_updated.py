@@ -1,6 +1,5 @@
 try:
     import random
-
     import mysql.connector as sql
     from person_names_720 import person_names
 
@@ -53,9 +52,9 @@ try:
     # -------------------------
     exam_names = [
         "Unit Test 1",
+        "Unit Test 2",
         "Quarterly Exam",
         "Half Yearly Exam",
-        "Unit Test 2",
         "Annual Exam"
     ]
 
@@ -148,18 +147,19 @@ try:
                     exam_id = exam_ids[exam]
 
                     for subject in subjects:
-
+                        mark=random.randint(1,100)
                         cur.execute(
                             """
                             INSERT INTO marks
-                            (roll_no,class,exam_id,subject)
-                            VALUES(%s,%s,%s,%s)
+                            (roll_no,class,exam_id,subject,marks)
+                            VALUES(%s,%s,%s,%s,%s)
                             """,
                             (
                                 roll_no,
                                 cls,
                                 exam_id,
-                                subject
+                                subject,
+                                mark
                             )
                         )
 

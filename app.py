@@ -185,9 +185,9 @@ def edit(roll_no:int, subject:str,exam_id:int):
         return render_template("edit.html",marks=mark)
     
 @app.route("/graph/<int:roll_no>/<string:subject>/<int:exam_id>", methods=["POST", "GET"])
-def graph(roll_no:int, subject:str,exam_id:int):
+def graph(roll_no:int,subject:str,exam_id:int):
     if subject:
-        exam_all=Exam.query.all()
+        exam_all=Exam.query.order_by(Exam.exam_id).all()
         res = Mark.query.filter(
                 Mark.student_class == session.get("class_value"),
                 Mark.exam_id == exam_id,
@@ -218,7 +218,7 @@ def graph(roll_no:int, subject:str,exam_id:int):
         fig, ax = plt.subplots(figsize=(12,6))
 
         # Background Color
-        bg = "#9FD3F5"          # Light Blue
+        bg = "#1565A6"          # Light Blue
         fig.patch.set_facecolor(bg)
         ax.set_facecolor(bg)
 
@@ -273,7 +273,7 @@ def graph(roll_no:int, subject:str,exam_id:int):
 
         # Labels
         plt.title(
-            "Student Performance",
+            f"Student Performance {roll_no}",
             fontsize=22,
             color="white",
             weight="bold",
@@ -281,13 +281,13 @@ def graph(roll_no:int, subject:str,exam_id:int):
         )
 
         plt.xlabel(
-            "Exam",
+            f"Exam {exam1}",
             fontsize=14,
             color="white"
         )
 
         plt.ylabel(
-            "Marks",
+            f"{subject} Marks",
             fontsize=14,
             color="white"
         )
@@ -324,9 +324,6 @@ def about():
 def support():
     return render_template("support.html")
     
-@app.route("/leaderboard")
-def leaderboard():
-    return render_template("leaderboard.html")
 
 if __name__ == "__main__":
     with app.app_context():
