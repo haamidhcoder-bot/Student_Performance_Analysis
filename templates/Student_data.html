@@ -4,67 +4,85 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <nav>
-        <a href="#" class="logo">Study Performance Analysis</a>
-        <ul>
-            <li><a href="Home.html">Home</a></li>
-            <li><a href="#">Student Data</a></li>
-            <li><a href="#">leaderboard</a></li>
-            <li><a href="#">About us</a></li>
-        </ul>
-      </nav>
+    <div class="navbar">
+        <div class="brand">SCHOOL PERFORMANCE ANALYSIS</div>
+        <nav>
+          <a href="/data" class="active">Home</a>
+          <a href="#">History</a>
+          <a href="/about">About us</a>
+        </nav>
+      </div>
+    <div class="container">
     <form action="/refresh" method="POST">
-        <button type="submit" style="display:inline; float:right;">⟳</button>
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+            <h2 style="margin-bottom:0;">Class {{ class_value }} results</h2>
+            <button type="submit" class="btn-secondary" title="Refresh">⟳ Refresh</button>
+        </div>
 
+        <div class="filter-bar">
         {% if class_value is not none and class_value <= 10 %}
-        <label for="subject10">Subject</label>
-        <select name="subject10" id="sub1">
-            <option value="">Select Subject</option>
-            <option value="English">English</option>
-            <option value="Maths">Maths</option>
-            <option value="Social">Social</option>
-            <option value="Science">Science</option>
-            <option value="Tamil">Tamil</option>
-            <option value="All">All Subjects</option>
-        </select><br>
+        <div class="field">
+            <label for="sub1">Subject</label>
+            <select name="subject10" id="sub1">
+                <option value="">Select Subject</option>
+                <option value="English">English</option>
+                <option value="Maths">Maths</option>
+                <option value="Social">Social</option>
+                <option value="Science">Science</option>
+                <option value="Tamil">Tamil</option>
+                <option value="All">All Subjects</option>
+            </select>
+        </div>
 
-        <label for="exam10">Exam</label>
-        <select name="exam10" id="exam">
-            <option value="">Select Exam</option>
-            <option value="Unit Test 1">Unit Test 1</option>
-            <option value="Quarterly Exam">Quarterly Exam</option>
-            <option value="Half Yearly Exam">Half Yearly Exam</option>
-            <option value="Unit Test 2">Unit Test 2</option>
-            <option value="Annual Exam">Annual Exam</option>
-        </select><br>
+        <div class="field">
+            <label for="exam">Exam</label>
+            <select name="exam10" id="exam">
+                <option value="">Select Exam</option>
+                <option value="Unit Test 1">Unit Test 1</option>
+                <option value="Quarterly Exam">Quarterly Exam</option>
+                <option value="Half Yearly Exam">Half Yearly Exam</option>
+                <option value="Unit Test 2">Unit Test 2</option>
+                <option value="Annual Exam">Annual Exam</option>
+            </select>
+        </div>
         {% else %}
-        <label for="subject12">Subject</label>
-        <select name="subject12" id="sub2">
-            <option value="">Select subject</option>
-            <option value="English">English</option>
-            <option value="Maths">Maths</option>
-            <option value="Physics">Physics</option>
-            <option value="Chemistry">Chemistry</option>
-            <option value="Biology">Biology</option>
-            <option value="All">All Subjects</option>
-        </select><br>
+        <div class="field">
+            <label for="sub2">Subject</label>
+            <select name="subject12" id="sub2">
+                <option value="">Select subject</option>
+                <option value="English">English</option>
+                <option value="Maths">Maths</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Biology">Biology</option>
+                <option value="All">All Subjects</option>
+            </select>
+        </div>
 
-        <label for="exam12">Exam</label>
-        <select name="exam12" id="exam2">
-            <option value="">Select Exam</option>
-            <option value="Unit Test 1">Unit Test 1</option>
-            <option value="Quarterly Exam">Quarterly Exam</option>
-            <option value="Half Yearly Exam">Half Yearly Exam</option>
-            <option value="Unit Test 2">Unit Test 2</option>
-            <option value="Annual Exam">Annual Exam</option>
-        </select><br>
+        <div class="field">
+            <label for="exam2">Exam</label>
+            <select name="exam12" id="exam2">
+                <option value="">Select Exam</option>
+                <option value="Unit Test 1">Unit Test 1</option>
+                <option value="Quarterly Exam">Quarterly Exam</option>
+                <option value="Half Yearly Exam">Half Yearly Exam</option>
+                <option value="Unit Test 2">Unit Test 2</option>
+                <option value="Annual Exam">Annual Exam</option>
+            </select>
+        </div>
         {% endif %}
+        <div class="field" style="flex: 0 0 auto;">
+            <button type="submit" style="margin-top:0;">Show results</button>
+        </div>
+        </div>
 
         {% if sub == "All" %}
-        <h4>All subjects--{{exam}}</h4>
-        <table border="2px">
+        <h4>All subjects &mdash; {{ exam }}</h4>
+        <table>
             <thead>
                 <tr>
                     <th>Roll no</th>
@@ -72,17 +90,19 @@
                     <th>Marks</th>
                 </tr>
             </thead>
+            <tbody>
             {% for stu in students %}
             <tr>
-                <td>{{ stu.roll_no }}</td>
-                <td>{{ stu.student_name }}</td>
-                <td>{{ total_marks.get(stu.roll_no, '') }}</td>
+                <td data-label="Roll no">{{ stu.roll_no }}</td>
+                <td data-label="Student name">{{ stu.student_name }}</td>
+                <td data-label="Marks" class="total-marks">{{ total_marks.get(stu.roll_no, '') }}</td>
             </tr>
             {% endfor %}
+            </tbody>
         </table>
         {% elif sub %}
-        <h4>{{sub}}--{{exam}}</h4>
-        <table border="2px">
+        <h4>{{ sub }} &mdash; {{ exam }}</h4>
+        <table>
             <thead>
                 <tr>
                     <th>Roll no</th>
@@ -91,25 +111,29 @@
                     <th>Actions</th>
                 </tr>
             </thead>
+            <tbody>
             {% for stu in students %}
             <tr>
-                <td>{{ stu.roll_no }}</td>
-                <td>{{ stu.student_name }}</td>
+                <td data-label="Roll no">{{ stu.roll_no }}</td>
+                <td data-label="Student name">{{ stu.student_name }}</td>
                 {% for mark in results %}
                 {% if mark.roll_no == stu.roll_no %}
-                <td>{{ mark.marks }}</td>
-                <td>
-                    <a href="/graph/{{mark.roll_no}}/{{mark.subject}}/{{mark.exam_id}}">Graph analysis</a><br>
-                    <a href="/edit/{{mark.roll_no}}/{{mark.subject}}/{{mark.exam_id}}">Edit</a>  
+                <td data-label="Marks">{{ mark.marks }}</td>
+                <td data-label="Actions" class="actions">
+                    <a href="/graph/{{mark.roll_no}}/{{mark.subject}}/{{mark.exam_id}}">Graph analysis</a>
+                    <a href="/edit/{{mark.roll_no}}/{{mark.subject}}/{{mark.exam_id}}">Edit</a>
                 </td>
                 {% endif %}
                 {% endfor %}
             </tr>
             {% endfor %}
+            </tbody>
         </table>
         {% else %}
         <h4>There are no data to show</h4>
         {% endif %}
+      </div>
     </form>
+    </div>
 </body>
 </html>

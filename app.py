@@ -1,9 +1,12 @@
+#pip install -r requirements.txt
 from flask import Flask,render_template,redirect,request,session
 from flask_sqlalchemy import SQLAlchemy
 import mysql.connector as sql
 from sqlalchemy import func
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+import pandas as pd
 
 cn = sql.connect(host='127.0.0.1', user='root', password="pass12345")
 cr = cn.cursor()
@@ -204,25 +207,106 @@ def graph(roll_no:int, subject:str,exam_id:int):
         exam = Exam.query.filter(Exam.exam_id==exam_id).first()
         exam1=exam.exam_name
 
-
-        list_cont=dict(marker=".",markersize=10,
-         markerfacecolor="red",
-         markeredgecolor="red",
-         linestyle="dashed",
-         linewidth=2)
         
-        x_axis,y_axis=np.array([exa.exam_name for exa in exam_all]),np.array([mar.marks for mar in mark ])
+        # Seaborn Theme
+        
+        sns.set_theme(style="white")
 
-        plt.plot(x_axis,y_axis,color="red",**list_cont)
+        
+        # Create Figure
+        
+        fig, ax = plt.subplots(figsize=(12,6))
 
-        plt.xlabel("Exams",color="green",fontweight="bold")
-        plt.ylabel("Marks",color="green",fontweight="bold")
+        # Background Color
+        bg = "#9FD3F5"          # Light Blue
+        fig.patch.set_facecolor(bg)
+        ax.set_facecolor(bg)
 
-        plt.tick_params(axis="both",colors="blue")
+        
+        # Grid
+        
+        ax.grid(
+            True,
+            color="white",
+            linewidth=0.8,
+            alpha=0.35
+        )
 
-        plt.grid(linestyle="dashed")#to form a grid 
+        ax.minorticks_on()
 
-        plt.title("Mark analysis",fontsize=12,color="blue",fontweight="bold")
+        ax.grid(
+            which="minor",
+            color="white",
+            linewidth=0.4,
+            alpha=0.25
+        )
+
+        df=pd.DataFrame({"Exam":[exa.exam_name for exa in exam_all],"Marks":[m.marks for m in mark]})
+        
+        # Line Plot (Seaborn)
+        
+        sns.lineplot(
+            data=df,
+            x="Exam",
+            y="Marks",
+            color="white",
+            linewidth=3,
+            marker="o",
+            markersize=9,
+            ax=ax
+        )
+
+        # Fill Area
+        ax.fill_between(
+            df["Exam"],
+            df["Marks"],
+            color="white",
+            alpha=0.18
+        )
+
+        # Axis Styling
+        ax.tick_params(colors="white", labelsize=12)
+
+        for spine in ax.spines.values():
+            spine.set_color("white")
+            spine.set_alpha(0.5)
+
+        # Labels
+        plt.title(
+            "Student Performance",
+            fontsize=22,
+            color="white",
+            weight="bold",
+            pad=20
+        )
+
+        plt.xlabel(
+            "Exam",
+            fontsize=14,
+            color="white"
+        )
+
+        plt.ylabel(
+            "Marks",
+            fontsize=14,
+            color="white"
+        )
+        # Value Labels
+        for x, y in zip(df["Exam"], df["Marks"]):
+            plt.text(
+                x,
+                y + 2,
+                str(y),
+                color="white",
+                fontsize=11,
+                ha="center"
+            )
+
+        plt.ylim(0,100)
+
+        sns.despine(left=False, bottom=False)
+
+        plt.tight_layout()
         plt.show()
 
         return render_template("Student_data.html", 
@@ -232,7 +316,9 @@ def graph(roll_no:int, subject:str,exam_id:int):
                                sub=subject,
                                exam=exam1) 
 
-
+@app.route("/about")
+def about():
+    return render_template("about_us.html")
     
 if __name__ == "__main__":
     with app.app_context():

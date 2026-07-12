@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="navbar">
+    <div class="brand">SCHOOL PERFORMANCE ANALYSIS</div>
+    <nav>
+      <a href="/data" class="active">Home</a>
+      <a href="#">History</a>
+      <a href="/about">About us</a>
+    </nav>
+  </div>
+  <center>
+  <form action="/data"  method="post">
+    <input type="number" name="class" placeholder="Enter the class" min="1" max="12" style="width: 200px;"><br>
+    <select name="section" id="sec">
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+    </select><br>
+    <button type="submit">Submit</button>
+  </form>
+</center>
+</body>
+</html>

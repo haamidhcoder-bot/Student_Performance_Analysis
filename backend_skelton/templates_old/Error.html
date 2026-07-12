@@ -7,10 +7,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="error-box">
-        <h2>Error occurred</h2>
-        <p>{{data}}</p>
-        <button type="button" onclick='window.location.href="{{location}}";'>OK</button><!--inline js-->
-    </div>
+    <h3>Error occurred</h3>
+    <h6>{{data}}</h6>
+    <button type="button" onclick='window.location.href="{{location}}";'>OK</button><!--inline js-->
 </body>
 </html>
