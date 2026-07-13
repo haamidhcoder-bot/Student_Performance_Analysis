@@ -327,16 +327,6 @@ button:active,
     transform: translateY(0);
 }
 
-.btn-secondary {
-    background: var(--white);
-    color: var(--primary);
-    border: 1px solid var(--primary);
-}
-
-.btn-secondary:hover {
-    background: var(--primary-pale);
-}
-
 .btn-row {
     display: flex;
     gap: 12px;
@@ -554,4 +544,15 @@ nav a.active{
 
 .fail{
     color:red
+}
+
+nav a i {
+    font-size: 22px;
+    color: white;
+    transition: 0.3s;
+}
+
+nav a:hover i {
+    color: #2f00ff;
+    transform: scale(1.15);
 }

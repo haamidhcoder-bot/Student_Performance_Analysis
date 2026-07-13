@@ -1,28 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About us</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="navbar">
-        <div class="brand">SCHOOL PERFORMANCE ANALYSIS</div>
-        <nav>
-          <a href="/data" class="{%if request.path=='/data'%}active{%endif%}">Home</a>
-          <a href="/about" class="{%if request.path=='/about'%}active{%endif%}">About us</a>
-        </nav>
-      </div>
-    <div class="container">
-        <div class="card about-section">
-            <h2>About us</h2>
-            <p>
-                The School Performance Analysis system helps teachers record, track, and analyze
-                student marks across subjects and exams. Select a class and section from the
-                Home page to view results, edit marks, and see performance trends over time.
-            </p>
-        </div>
+{% extends "base.html" %}
+
+{%block head%}
+<title>About us</title>
+{%endblock%}
+
+{%block body%}
+<div class="container">
+    <div class="card about-section">
+        <h2>About us</h2>
+        <p>
+            The School Performance Analysis system helps teachers record, track, and analyze
+            student marks across subjects and exams. Select a class and section from the
+            Home page to view results, edit marks, and see performance trends over time.
+        </p>
     </div>
-</body>
-</html>
+</div>
+{%endblock%}

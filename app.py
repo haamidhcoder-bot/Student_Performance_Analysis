@@ -81,6 +81,8 @@ def login_page():
                   pass_n=session[user_n]
             except:
                 pass_n=request.form.get("password","")"""
+            session["username"]=user_n
+            session["password"]=pass_n
             remember=request.form.get("remember","")
             teachers=Teacher.query.filter(
                 Teacher.Gmail==user_n,
@@ -332,7 +334,9 @@ def about():
 def support():
     return render_template("support.html")
     
-
+@app.route("/profile")
+def profile():
+    return render_template("profile.html",username=session.get("username","").strip("@gmail.com"))
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

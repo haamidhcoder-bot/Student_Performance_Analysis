@@ -1,20 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-  <div class="navbar">
-    <div class="brand">SCHOOL PERFORMANCE ANALYSIS</div>
-    <nav>
-      <a href="/data" class="{%if request.path=='/data'%}active{%endif%}">Home</a>
-      <a href="/about" class="{%if request.path=='/about'%}active{%endif%}">About us</a>
-    </nav>
-  </div>
-  <div class="container">
+{% extends "base.html" %}
+
+{%block head%}
+<title>Home</title>
+{%endblock%}
+
+{%block body%}
+<div class="container">
     <div class="card" style="max-width: 420px; margin: 60px auto;">
       <h2 style="text-align:center;">Select class &amp; section</h2>
       {% if error %}
@@ -39,5 +30,5 @@
       </form>
     </div>
   </div>
-</body>
-</html>
+
+{%endblock%}

@@ -1,25 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analysis</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <div class="navbar">
-        <div class="brand">SCHOOL PERFORMANCE ANALYSIS</div>
-        <nav>
-          <a href="/data" class="{%if request.path=='/data'%}active{%endif%}">Home</a>
-          <a href="/about" class="{%if request.path=='/about'%}active{%endif%}">About us</a>
-        </nav>
-      </div>
-    <div class="container">
+{% extends "base.html" %}
+
+{%block head%}
+<title>Data</title>
+{%endblock%}
+
+{%block body%}
+<div class="container">
     <form action="/refresh" method="POST">
       <div class="card">
         <div style="display:flex; align-items:center; justify-content:space-between;">
             <h2 style="margin-bottom:0;">Class {{ class_value }} results</h2>
-            <button type="submit" class="btn-secondary" title="Refresh">⟳ Refresh</button>
         </div>
 
         <div class="filter-bar">
@@ -134,5 +124,4 @@
       </div>
     </form>
     </div>
-</body>
-</html>
+{%endblock%}
