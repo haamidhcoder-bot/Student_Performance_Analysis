@@ -8,7 +8,7 @@ USE schooldb;
 -- ==========================================================
 
 CREATE TABLE teachers (
-    username VARCHAR(50) PRIMARY KEY,
+    Gmail VARCHAR(50) PRIMARY KEY,
     password VARCHAR(255) NOT NULL
 );
 

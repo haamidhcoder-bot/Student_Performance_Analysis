@@ -27,7 +27,7 @@ db = SQLAlchemy(app)
 class Teacher(db.Model):
     __tablename__ = "teachers"
 
-    username = db.Column(db.String(50), primary_key=True)
+    Gmail = db.Column(db.String(50), primary_key=True)
     password = db.Column(db.String(255), nullable=False)
 
 
@@ -76,10 +76,18 @@ def login_page():
         if request.method=="POST":
             user_n=request.form.get("username","")
             pass_n=request.form.get("password","")
+            """try:
+                if session[user_n]:
+                  pass_n=session[user_n]
+            except:
+                pass_n=request.form.get("password","")"""
+            remember=request.form.get("remember","")
             teachers=Teacher.query.filter(
-                Teacher.username==user_n,
+                Teacher.Gmail==user_n,
                 Teacher.password==pass_n
             ).first()
+            """if remember:
+                session[user_n]=pass_n"""
             if teachers:
                 return render_template("Home.html")
             else:

@@ -34,14 +34,14 @@ try:
     # Teachers
     # -------------------------
     teachers = [
-        ("teacher1", "pass123"),
-        ("teacher2", "pass456"),
-        ("teacher3", "pass789")
+        ("teacher1@gmail.com", "pass123"),
+        ("teacher2@gmail.com", "pass456"),
+        ("teacher3@gmail.com", "pass789")
     ]
 
     cur.executemany(
         """
-        INSERT INTO teachers(username,password)
+        INSERT INTO teachers(Gmail,password)
         VALUES(%s,%s)
         """,
         teachers
