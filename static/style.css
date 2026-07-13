@@ -556,3 +556,7 @@ nav a:hover i {
     color: #2f00ff;
     transform: scale(1.15);
 }
+
+.exit button:hover{
+    background-color: red;
+}

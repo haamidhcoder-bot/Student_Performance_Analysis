@@ -1,5 +1,5 @@
 #pip install -r requirements.txt
-from flask import Flask,render_template,redirect,request,session
+from flask import Flask,render_template,redirect,request,session,url_for
 from flask_sqlalchemy import SQLAlchemy
 import mysql.connector as sql
 from sqlalchemy import func
@@ -337,6 +337,12 @@ def support():
 @app.route("/profile")
 def profile():
     return render_template("profile.html",username=session.get("username","").strip("@gmail.com"))
+
+@app.route("/log-out", methods=["POST", "GET"])
+def log_out():
+    session.clear()
+    return redirect(url_for("login_page"))
+
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
