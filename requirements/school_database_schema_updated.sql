@@ -20,7 +20,9 @@ CREATE TABLE students (
     roll_no INT PRIMARY KEY,
     student_name VARCHAR(100) NOT NULL,
     class INT NOT NULL CHECK (class BETWEEN 1 AND 12),
-    section CHAR(1) NOT NULL CHECK (section IN ('A','B','C'))
+    section CHAR(1) NOT NULL CHECK (section IN ('A','B','C')),
+    student_gmail CHAR(100) CHECK (student_gmail LIKE '%@gmail.com')
+
 );
 
 -- ==========================================================

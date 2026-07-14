@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 import pandas as pd
+import smtplib
+from email.message import EmailMessage
+from config import dict_details#contains app password for emails
 
 cn = sql.connect(host='127.0.0.1', user='root', password="pass12345")
 cr = cn.cursor()
@@ -24,6 +27,25 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 
 db = SQLAlchemy(app)
 
+def email(from_address,to_address,subject,message,app_password):
+    msg = EmailMessage()
+
+    msg["Subject"] =subject
+    msg["From"] = from_address
+    msg["To"] = to_address
+
+    msg.set_content(message)
+
+    with smtplib.SMTP("smtp.gmail.com", 587) as server:
+        server.starttls()
+
+        server.login(
+            from_address,
+            app_password
+        )
+
+        server.send_message(msg)
+
 class Teacher(db.Model):
     __tablename__ = "teachers"
 
@@ -38,6 +60,7 @@ class Student(db.Model):
     student_name = db.Column(db.String(100), nullable=False)
     student_class = db.Column("class", db.Integer, nullable=False)
     section = db.Column(db.String(1), nullable=False)
+    student_gmail = db.Column(db.String(100))
 
 
 class Exam(db.Model):
@@ -342,6 +365,48 @@ def profile():
 def log_out():
     session.clear()
     return redirect(url_for("login_page"))
+
+@app.route("/send_results", methods=["POST", "GET"])
+def send_results():
+    PASSWORD=dict_details[session.get("username","")]
+    class_value = session.get("class_value")
+    sec = session.get("sec")
+    sub = request.form.get("subject10", "") or request.form.get("subject12", "")
+    exa = request.form.get("exam10", "") or request.form.get("exam12", "")
+    students = Student.query.filter(
+        Student.student_class == class_value,
+        Student.section == sec
+    ).all()
+
+    exam = Exam.query.filter(Exam.exam_name == exa).first() if exa else None
+    res = []
+    if exam is not None and sub and exa:
+        res = Mark.query.filter(
+            Mark.student_class == class_value,
+            Mark.exam_id == exam.exam_id,
+            Mark.subject == sub
+        ).all()
+    for stu in students:
+        for mark in res:
+            if stu.roll_no==mark.roll_no:
+                msg=f"""
+                    Dear Parent/Guardian,
+
+    This is to inform you that {stu.student_name} has scored {mark.marks} marks in {sub} for the {exa}. We encourage you to review the student's progress and continue supporting their learning. Thank you for your cooperation.
+
+                    Regards,
+                    School Administration
+                    """
+                try:
+                    email(session.get("username",""),stu.student_gmail,f"{sub}-{exa}-Marks",msg,PASSWORD)
+                except Exception as e:
+                    print(f"Error:{e}")
+    return render_template("Student_data.html", 
+                               class_value=session.get("class_value"),
+                               students=students,
+                               results=res,
+                               sub=sub,
+                               exam=exa)
 
 if __name__ == "__main__":
     with app.app_context():

@@ -36,7 +36,8 @@ try:
     teachers = [
         ("teacher1@gmail.com", "pass123"),
         ("teacher2@gmail.com", "pass456"),
-        ("teacher3@gmail.com", "pass789")
+        ("teacher3@gmail.com", "pass789"),
+        ("haamidhpm@gmail.com","pass13579")
     ]
 
     cur.executemany(
@@ -122,19 +123,21 @@ try:
                 roll_no = int(f"{cls}{sections[section]}{roll:02d}")
 
                 student_name = person_names[name_index]
+                student_gmail=student_name.replace(" ", "")+"@gmail.com"
                 name_index += 1
 
                 cur.execute(
                     """
                     INSERT INTO students
-                    (roll_no,student_name,class,section)
-                    VALUES(%s,%s,%s,%s)
+                    (roll_no,student_name,class,section,student_gmail)
+                    VALUES(%s,%s,%s,%s,%s)
                     """,
                     (
                         roll_no,
                         student_name,
                         cls,
-                        section
+                        section,
+                        student_gmail
                     )
                 )
 
