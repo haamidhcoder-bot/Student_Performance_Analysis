@@ -9,7 +9,7 @@ import seaborn as sns
 import pandas as pd
 import smtplib
 from email.message import EmailMessage
-from config import dict_details,Mysql_pass #contains password that are confidential
+from config import dict_details,Mysql_pass,session_key #contains password that are confidential
 
 cn = sql.connect(host='127.0.0.1', user='root', password=Mysql_pass)
 cr = cn.cursor()
@@ -19,7 +19,7 @@ cr.execute("create database if not exists schooldb")
 app=Flask(__name__)
 
 
-app.secret_key = "some-random-secret-string"  # required for sessions to work
+app.secret_key = session_key  # required for sessions to work
 
 app.config["SQLALCHEMY_DATABASE_URI"] = (
     f"mysql+pymysql://root:{Mysql_pass}@localhost/schooldb"#format for using mysql
@@ -445,4 +445,4 @@ if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-    app.run(debug=True)
+    app.run(debug=True)#false if deploying
