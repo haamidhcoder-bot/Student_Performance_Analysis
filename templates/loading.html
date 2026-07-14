@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block head %}
+<title>Sending Results…</title>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="card" style="text-align:center; padding:60px 32px;">
+        <div class="spinner"></div>
+        <h2 id="loadingTitle">Sending results to parents…</h2>
+        <p style="color: var(--text-muted);">
+            Please don't close or refresh this page while emails are being sent.
+        </p>
+    </div>
+</div>
+
+<style>
+.spinner {
+    margin: 0 auto 24px;
+    width: 56px;
+    height: 56px;
+    border: 6px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<script>
+    (function () {
+        var params = new URLSearchParams(window.location.search);
+        var sub = params.get("sub") || "";
+        var exam = params.get("exam") || "";
+
+        if (!sub || !exam) {
+            window.location.href = "/error_page?msg=" + encodeURIComponent("Missing subject or exam. Please try again.");
+            return;
+        }
+
+        // Backend accepts either the class<=10 or class>10 field names,
+        // so we send both to be safe.
+        var formData = new FormData();
+        formData.append("subject10", sub);
+        formData.append("exam10", exam);
+        formData.append("subject12", sub);
+        formData.append("exam12", exam);
+
+        fetch("/send_results", {
+            method: "POST",
+            body: formData
+        })
+        .then(function (res) {
+            return res.json().then(function (data) {
+                return { ok: res.ok, data: data };
+            });
+        })
+        .then(function (result) {
+            if (result.ok && result.data.status === "success") {
+                var successParams = new URLSearchParams({
+                    sent: result.data.sent_count,
+                    sub: sub,
+                    exam: exam
+                });
+                window.location.href = "/success?" + successParams.toString();
+            } else {
+                var msg = (result.data && result.data.message) || "Something went wrong while sending results.";
+                window.location.href = "/error_page?msg=" + encodeURIComponent(msg);
+            }
+        })
+        .catch(function (err) {
+            window.location.href = "/error_page?msg=" + encodeURIComponent("Network error: " + err.message);
+        });
+    })();
+</script>
+{% endblock %}

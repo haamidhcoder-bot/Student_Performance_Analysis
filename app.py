@@ -1,5 +1,5 @@
 #pip install -r requirements.txt
-from flask import Flask,render_template,redirect,request,session,url_for
+from flask import Flask,render_template,redirect,request,session,url_for,jsonify
 from flask_sqlalchemy import SQLAlchemy
 import mysql.connector as sql
 from sqlalchemy import func
@@ -366,47 +366,80 @@ def log_out():
     session.clear()
     return redirect(url_for("login_page"))
 
-@app.route("/send_results", methods=["POST", "GET"])
+@app.route("/loading")
+def loading():
+    """Shown immediately after the user clicks 'Send Results'.
+    This page's JS fires the actual /send_results request in the background
+    and then redirects to /success or /error_page once it finishes."""
+    sub = request.args.get("sub", "")
+    exa = request.args.get("exam", "")
+    return render_template("loading.html", sub=sub, exam=exa)
+
+
+@app.route("/success")
+def success():
+    sent_count = request.args.get("sent", "0")
+    sub = request.args.get("sub", "")
+    exa = request.args.get("exam", "")
+    return render_template("success.html", sent_count=sent_count, sub=sub, exam=exa)
+
+
+@app.route("/error_page")
+def error_page():
+    msg = request.args.get("msg", "Something went wrong while sending results.")
+    return render_template("Error.html", data=msg, location="/data")
+
+
+@app.route("/send_results", methods=["POST"])
 def send_results():
-    PASSWORD=dict_details[session.get("username","")]
+    """Called via fetch() from loading.html. Returns JSON, not HTML,
+    so the loading page's JS can decide where to redirect next."""
+    PASSWORD = dict_details.get(session.get("username", ""))
+    if not PASSWORD:
+        return jsonify({"status": "error", "message": "Could not find email credentials for this account."}), 400
+
     class_value = session.get("class_value")
     sec = session.get("sec")
     sub = request.form.get("subject10", "") or request.form.get("subject12", "")
     exa = request.form.get("exam10", "") or request.form.get("exam12", "")
+
+    if not sub or not exa or class_value is None:
+        return jsonify({"status": "error", "message": "Missing subject, exam, or class information."}), 400
+
     students = Student.query.filter(
         Student.student_class == class_value,
         Student.section == sec
     ).all()
 
-    exam = Exam.query.filter(Exam.exam_name == exa).first() if exa else None
+    exam = Exam.query.filter(Exam.exam_name == exa).first()
     res = []
-    if exam is not None and sub and exa:
+    if exam is not None:
         res = Mark.query.filter(
             Mark.student_class == class_value,
             Mark.exam_id == exam.exam_id,
             Mark.subject == sub
         ).all()
+
+    sent_count = 0
     for stu in students:
         for mark in res:
-            if stu.roll_no==mark.roll_no:
-                msg=f"""
-                    Dear Parent/Guardian,
+            if stu.roll_no == mark.roll_no:
+                status = "Fail" if mark.marks <= 30 else "Pass"
+                msg = f"""Dear Parent/Guardian,
 
-    This is to inform you that {stu.student_name} has scored {mark.marks} marks in {sub} for the {exa}. We encourage you to review the student's progress and continue supporting their learning. Thank you for your cooperation.
+This is to inform you that {stu.student_name} has scored {mark.marks} marks and {status}ed in {sub} for the {exa}.
+We encourage you to review the student's progress and continue supporting their learning.
+Thank you for your cooperation.
 
-                    Regards,
-                    School Administration
-                    """
+Regards,
+School Administration"""
                 try:
-                    email(session.get("username",""),stu.student_gmail,f"{sub}-{exa}-Marks",msg,PASSWORD)
+                    email(session.get("username", ""), stu.student_gmail, f"{sub}-{exa}-Marks", msg, PASSWORD)
+                    sent_count += 1
                 except Exception as e:
-                    print(f"Error:{e}")
-    return render_template("Student_data.html", 
-                               class_value=session.get("class_value"),
-                               students=students,
-                               results=res,
-                               sub=sub,
-                               exam=exa)
+                    return jsonify({"status": "error", "message": f"{e}\nContact the developer"}), 500
+
+    return jsonify({"status": "success", "sent_count": sent_count})
 
 if __name__ == "__main__":
     with app.app_context():

@@ -68,9 +68,7 @@
             <button type="submit" style="margin-top:0;">Show results</button>
         </div>
         <div class="field" style="flex: 0 0 auto;">
-            <button type="submit"
-                    formaction="/send_results"
-                    formmethod="POST">
+            <button type="button" id="sendResultsBtn">
                 Send Results
             </button>
         </div>
@@ -131,4 +129,28 @@
       </div>
     </form>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var sendBtn = document.getElementById("sendResultsBtn");
+            if (!sendBtn) return;
+
+            sendBtn.addEventListener("click", function () {
+                // Whichever field set is present in the DOM (class <=10 vs >10)
+                var subEl = document.getElementById("sub1") || document.getElementById("sub2");
+                var examEl = document.getElementById("exam") || document.getElementById("exam2");
+
+                var sub = subEl ? subEl.value : "";
+                var exam = examEl ? examEl.value : "";
+
+                if (!sub || !exam) {
+                    alert("Please select both a subject and an exam before sending results.");
+                    return;
+                }
+
+                var params = new URLSearchParams({ sub: sub, exam: exam });
+                window.location.href = "/loading?" + params.toString();
+            });
+        });
+    </script>
 {%endblock%}
