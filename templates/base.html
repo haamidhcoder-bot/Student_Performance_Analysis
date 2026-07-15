@@ -13,7 +13,7 @@
         <div class="brand">SCHOOL PERFORMANCE ANALYSIS</div>
   
         <nav>
-            <a href="/home" class="{% if request.path=='/home' %}active{% endif %}">
+            <a href="/home" class="{% if request.path=='/home'or request.path=='/refresh' %}active{% endif %}">
                 <i class="fa-solid fa-house"></i> Home
             </a>
   

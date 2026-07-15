@@ -9,10 +9,18 @@
     <form action="/refresh" method="POST">
       <div class="card">
         <div style="display:flex; align-items:center; justify-content:space-between;">
-            <h2 style="margin-bottom:0;">Class {{ class_value }} results</h2>
+            <h2 style="margin-bottom:0;">Class {{ class_value }}{% if sec %} - Section {{ sec }}{% endif %} results</h2>
         </div>
 
         <div class="filter-bar">
+        <div class="field">
+            <label for="sec">Section</label>
+            <select name="section" id="sec">
+                <option value="A" {% if sec == "A" %}selected{% endif %}>A</option>
+                <option value="B" {% if sec == "B" %}selected{% endif %}>B</option>
+                <option value="C" {% if sec == "C" %}selected{% endif %}>C</option>
+            </select>
+        </div>
         {% if class_value is not none and class_value <= 10 %}
         <div class="field">
             <label for="sub1">Subject</label>

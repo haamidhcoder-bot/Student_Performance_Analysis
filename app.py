@@ -126,14 +126,16 @@ def login_page():
             pass_n=request.form.get("password","")
             session["username"]=user_n
             session["password"]=pass_n
+            remember=request.form.get("remember","")
             teachers=Teacher.query.filter(
                 Teacher.Gmail==user_n,
                 Teacher.password==pass_n
             ).first()
-            if teachers:
+            if remember and teachers:
                 session["logged_in"]=True
+            if teachers:
                 app.logger.info(f"{session.get("username","")} logged in")
-                return render_template("class.html",log=session.get("logged_in",""),user=session.get("username",""))
+                return render_template("class.html")
             else:
                 app.logger.error("incorrect username or password")
                 return render_template("Error.html",data=" incorrect username or password",location="/")
@@ -147,21 +149,23 @@ def login_page():
 def data():
     if request.method == "POST":
         class_value = request.form.get("class", "").strip()
-        sec = request.form.get("section", "").strip()
 
         if class_value:
             try:
                 class_value = int(class_value)
             except:
                 return render_template("class.html", error="Invalid class value.")
-            session["class_value"] =class_value
-            session["sec"]=sec
+            session["class_value"] = class_value
             students = Student.query.filter(
-                Student.student_class == class_value,
-                Student.section == sec
+                Student.student_class == class_value
             ).all()
             if students:
-                return render_template("Home.html", class_value=class_value,sub="")
+                return render_template(
+                    "Home.html",
+                    class_value=class_value,
+                    sub="",
+                    sec=session.get("sec", "")
+                )
         app.logger.error("No matching students found")
         return render_template("class.html", error="No matching students found.")
 
@@ -169,13 +173,19 @@ def data():
 
 @app.route("/home")
 def home():
-    return render_template("Home.html", class_value=session.get("class_value",""),sub="")
+    return render_template(
+        "Home.html",
+        class_value=session.get("class_value", ""),
+        sub="",
+        sec=session.get("sec", "")
+    )
 
 @app.route("/refresh", methods=["GET", "POST"])
 def refresh():
     class_value = session.get("class_value")
-    sec = session.get("sec")
     if request.method == "POST" and class_value is not None:
+        sec = request.form.get("section", "").strip() or session.get("sec", "")
+        session["sec"] = sec
         sub = request.form.get("subject10", "") or request.form.get("subject12", "")
         exa = request.form.get("exam10", "") or request.form.get("exam12", "")
         students = Student.query.filter(
@@ -208,7 +218,8 @@ def refresh():
                 students=students,
                 total_marks=total_marks,
                 sub=sub,
-                exam=exa
+                exam=exa,
+                sec=sec
             )
 
         if sub and exa:
@@ -218,7 +229,8 @@ def refresh():
                 students=students,
                 results=res,
                 sub=sub,
-                exam=exa
+                exam=exa,
+                sec=sec
             )
         elif sub=="" and exa=="":
             return render_template("Error.html",data="select the subject and exam",location="/data")
