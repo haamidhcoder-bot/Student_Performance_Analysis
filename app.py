@@ -10,6 +10,8 @@ import pandas as pd
 import smtplib
 from email.message import EmailMessage
 from config import dict_details,Mysql_pass,session_key #contains password that are confidential
+import logging
+from logging.handlers import RotatingFileHandler
 
 cn = sql.connect(host='127.0.0.1', user='root', password=Mysql_pass)
 cr = cn.cursor()
@@ -26,6 +28,27 @@ app.config["SQLALCHEMY_DATABASE_URI"] = (
 )
 
 db = SQLAlchemy(app)
+
+formatter = logging.Formatter(
+    "%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+
+handler = RotatingFileHandler(
+    "app.log",
+    maxBytes=1024 * 1024,  # 1 MB
+    backupCount=5
+)
+
+formatter = logging.Formatter(
+    "%(asctime)s - %(levelname)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
+
+handler.setFormatter(formatter)
+
+app.logger.addHandler(handler)
+app.logger.setLevel(logging.INFO)
 
 def email(from_address,to_address,subject,message,app_password):
     msg = EmailMessage()
@@ -114,8 +137,10 @@ def login_page():
             """if remember:
                 session[user_n]=pass_n"""
             if teachers:
+                app.logger.info(f"{session.get("username","")} logged in")
                 return render_template("Home.html")
             else:
+                app.logger.error("incorrect username or password")
                 return render_template("Error.html",data=" incorrect username or password",location="/")
         return render_template("login_page.html")
 
@@ -138,7 +163,7 @@ def data():
             ).all()
             if students:
                 return render_template("Student_data.html", class_value=class_value,sub="")
-
+        app.logger.error("No matching students found")
         return render_template("Home.html", error="No matching students found.")
 
     return render_template("Home.html")
@@ -208,10 +233,11 @@ def edit(roll_no:int, subject:str,exam_id:int):
         mar=request.form["content"]#to get info from input box 
         mark.marks=mar
         try:
+            app.logger.info(f"{session.get("username","")} has editted marks of student with roll no {roll_no}")
             db.session.commit()#commiting it
             return redirect("/data")#back to home
         except Exception as e:
-            print(f"ERROR {e}")
+            app.logger.error(e)
             return redirect("/")
         #create a new task
     else:
@@ -363,6 +389,7 @@ def profile():
 
 @app.route("/log-out", methods=["POST", "GET"])
 def log_out():
+    app.logger.info(f"{session.get("username","")} has logged out")
     session.clear()
     return redirect(url_for("login_page"))
 
@@ -381,12 +408,14 @@ def success():
     sent_count = request.args.get("sent", "0")
     sub = request.args.get("sub", "")
     exa = request.args.get("exam", "")
+    app.logger.info(f"{session.get("username","")} susccesfully sent emails")
     return render_template("success.html", sent_count=sent_count, sub=sub, exam=exa)
 
 
 @app.route("/error_page")
 def error_page():
     msg = request.args.get("msg", "Something went wrong while sending results.")
+    app.logger.error("Something went wrong while sending results.")
     return render_template("Error.html", data=msg, location="/data")
 
 
