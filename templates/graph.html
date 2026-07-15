@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{%block head%}
+<title>Graph</title>
+{%endblock%}
+
+{%block body%}
+{% if graph %}
+<div class="graph-container">
+    <h3>Performance Graph</h3>
+
+    <img src="data:image/png;base64,{{ graph }}"
+        class="graph-image">
+</div>
+{% endif %}
+{%endblock%}

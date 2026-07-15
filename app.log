@@ -1,3 +1,53 @@
 2026-07-15 08:42:25 - INFO - haamidhpm@gmail.com logged in
 2026-07-15 08:44:16 - INFO - haamidhpm@gmail.com susccesfully sent emails
 2026-07-15 08:44:34 - INFO - haamidhpm@gmail.com has logged out
+2026-07-15 09:06:16 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 09:11:34 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 09:17:50 - ERROR - incorrect username or password
+2026-07-15 09:18:06 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 09:21:03 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 09:22:00 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 09:22:48 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 09:36:24 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 09:52:22 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 09:54:28 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 09:56:52 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 10:02:44 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 10:05:28 - INFO - haamidhpm@Gmail.com logged in
+2026-07-15 10:07:11 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 10:49:18 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 10:52:20 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 10:58:03 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 11:11:13 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 11:19:35 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 11:43:36 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 12:02:55 - ERROR - Exception on /leaderboard [POST]
+Traceback (most recent call last):
+  File "C:\Users\dell\Desktop\Student_Performance_Analysis\.venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+  File "C:\Users\dell\Desktop\Student_Performance_Analysis\.venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "C:\Users\dell\Desktop\Student_Performance_Analysis\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "C:\Users\dell\Desktop\Student_Performance_Analysis\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "c:\Users\dell\Desktop\Student_Performance_Analysis\app.py", line 498, in leaderboard
+    leaderboard =db.session.query(
+                 ~~~~~~~~~~~~~~~~^
+                    Mark.roll_no,
+                    ^^^^^^^^^^^^^
+                    func.sum(Mark.marks).label("total")
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                ).filter(
+                ^
+TypeError: 'Query' object is not callable
+2026-07-15 12:04:26 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 12:09:29 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 12:12:20 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 12:45:14 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 12:52:12 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 12:52:54 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 12:57:06 - INFO - haamidhpm@gmail.com logged in
+2026-07-15 12:57:51 - INFO - teacher1@gmail.com logged in
+2026-07-15 12:58:45 - INFO - teacher1@gmail.com has editted marks of student with roll no 2110

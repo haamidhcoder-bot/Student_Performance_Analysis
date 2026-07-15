@@ -6,29 +6,155 @@
 
 {%block body%}
 <div class="container">
-    <div class="card" style="max-width: 420px; margin: 60px auto;">
-      <h2 style="text-align:center;">Select class &amp; section</h2>
-      {% if error %}
-      <div class="alert alert-error">{{ error }}</div>
-      {% endif %}
-      <form action="/data" method="post">
-        <div class="filter-bar" style="background:none; border:none; padding:0; margin-bottom:0;">
-          <div class="field">
-            <label for="class">Class</label>
-            <input type="number" name="class" id="class" placeholder="Enter the class" min="1" max="12">
-          </div>
-          <div class="field">
-            <label for="sec">Section</label>
-            <select name="section" id="sec">
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-            </select>
-          </div>
+    <form action="/refresh" method="POST">
+      <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+            <h2 style="margin-bottom:0;">Class {{ class_value }} results</h2>
         </div>
-        <button type="submit" style="width:100%;">Submit</button>
-      </form>
-    </div>
-  </div>
 
+        <div class="filter-bar">
+        {% if class_value is not none and class_value <= 10 %}
+        <div class="field">
+            <label for="sub1">Subject</label>
+            <select name="subject10" id="sub1">
+                <option value="">Select Subject</option>
+                <option value="English">English</option>
+                <option value="Maths">Maths</option>
+                <option value="Social">Social</option>
+                <option value="Science">Science</option>
+                <option value="Tamil">Tamil</option>
+                <option value="All">All Subjects</option>
+            </select>
+        </div>
+
+        <div class="field">
+            <label for="exam">Exam</label>
+            <select name="exam10" id="exam">
+                <option value="">Select Exam</option>
+                <option value="Unit Test 1">Unit Test 1</option>
+                <option value="Quarterly Exam">Quarterly Exam</option>
+                <option value="Half Yearly Exam">Half Yearly Exam</option>
+                <option value="Unit Test 2">Unit Test 2</option>
+                <option value="Annual Exam">Annual Exam</option>
+            </select>
+        </div>
+        {% else %}
+        <div class="field">
+            <label for="sub2">Subject</label>
+            <select name="subject12" id="sub2">
+                <option value="">Select subject</option>
+                <option value="English">English</option>
+                <option value="Maths">Maths</option>
+                <option value="Physics">Physics</option>
+                <option value="Chemistry">Chemistry</option>
+                <option value="Biology">Biology</option>
+                <option value="All">All Subjects</option>
+            </select>
+        </div>
+        
+        <div class="field">
+            <label for="exam2">Exam</label>
+            <select name="exam12" id="exam2">
+                <option value="">Select Exam</option>
+                <option value="Unit Test 1">Unit Test 1</option>
+                <option value="Quarterly Exam">Quarterly Exam</option>
+                <option value="Half Yearly Exam">Half Yearly Exam</option>
+                <option value="Unit Test 2">Unit Test 2</option>
+                <option value="Annual Exam">Annual Exam</option>
+            </select>
+        </div>
+        {% endif %}
+        <div class="field" style="flex: 0 0 auto;">
+            <button type="submit" style="margin-top:0;">Show results</button>
+        </div>
+        <div class="field" style="flex: 0 0 auto;">
+            <button type="button" id="sendResultsBtn">
+                Send Results
+            </button>
+        </div>
+        </div>
+        
+        {% if sub == "All" %}
+        <h4>All subjects &mdash; {{ exam }}</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Roll no</th>
+                    <th>Student name</th>
+                    <th>Marks</th>
+                    <th>Percentage</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stu in students %}
+                <tr>
+                    <td data-label="Roll no" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ stu.roll_no }}</td>
+                    <td data-label="Student name" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ stu.student_name }}</td>
+                    <td data-label="Marks" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ total_marks.get(stu.roll_no, '') }}</td>
+                    <td  class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ (total_marks.get(stu.roll_no, '')/500)*100 }}</td>
+                    <td class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{% if total_marks.get(stu.roll_no, '') <= 150 %}Fail{%else%}Pass{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% elif sub %}
+        <h4>{{ sub }} &mdash; {{ exam }}</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Roll no</th>
+                    <th>Student name</th>
+                    <th>Marks</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stu in students %}
+                    {% for mark in results %}
+                    {% if mark.roll_no == stu.roll_no %}
+                    <tr>
+                        <td data-label="Roll no" class="{% if mark.marks <= 30 %}fail{% endif %}">{{ stu.roll_no }}</td>
+                        <td data-label="Student name" class="{% if mark.marks <= 30 %}fail{% endif %}">{{ stu.student_name }}</td>
+                        <td data-label="Marks" class="{% if mark.marks <= 30 %}fail{% endif %}">{{ mark.marks }}</td>
+                        <td data-label="Actions" class="actions">
+                            <a href="/graph/{{ mark.roll_no }}/{{ mark.subject }}/{{ mark.exam_id }}">Graph analysis</a>
+                            <a href="/edit/{{ mark.roll_no }}/{{ mark.subject }}/{{ mark.exam_id }}">Edit</a>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <h4>There are no data to show</h4>
+        {% endif %}
+      </div>
+    </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var sendBtn = document.getElementById("sendResultsBtn");
+            if (!sendBtn) return;
+
+            sendBtn.addEventListener("click", function () {
+                // Whichever field set is present in the DOM (class <=10 vs >10)
+                var subEl = document.getElementById("sub1") || document.getElementById("sub2");
+                var examEl = document.getElementById("exam") || document.getElementById("exam2");
+
+                var sub = subEl ? subEl.value : "";
+                var exam = examEl ? examEl.value : "";
+
+                if (!sub || !exam) {
+                    alert("Please select both a subject and an exam before sending results.");
+                    return;
+                }
+
+                var params = new URLSearchParams({ sub: sub, exam: exam });
+                window.location.href = "/loading?" + params.toString();
+            });
+        });
+    </script>
 {%endblock%}

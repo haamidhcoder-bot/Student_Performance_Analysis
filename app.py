@@ -12,6 +12,8 @@ from email.message import EmailMessage
 from config import dict_details,Mysql_pass,session_key #contains password that are confidential
 import logging
 from logging.handlers import RotatingFileHandler
+from io import BytesIO
+import base64
 
 cn = sql.connect(host='127.0.0.1', user='root', password=Mysql_pass)
 cr = cn.cursor()
@@ -138,11 +140,12 @@ def login_page():
                 session[user_n]=pass_n"""
             if teachers:
                 app.logger.info(f"{session.get("username","")} logged in")
-                return render_template("Home.html")
+                return render_template("class.html")
             else:
                 app.logger.error("incorrect username or password")
                 return render_template("Error.html",data=" incorrect username or password",location="/")
         return render_template("login_page.html")
+
 
 @app.route("/data", methods=["GET", "POST"])
 def data():
@@ -154,7 +157,7 @@ def data():
             try:
                 class_value = int(class_value)
             except:
-                return render_template("Home.html", error="Invalid class value.")
+                return render_template("class.html", error="Invalid class value.")
             session["class_value"] =class_value
             session["sec"]=sec
             students = Student.query.filter(
@@ -162,11 +165,15 @@ def data():
                 Student.section == sec
             ).all()
             if students:
-                return render_template("Student_data.html", class_value=class_value,sub="")
+                return render_template("Home.html", class_value=class_value,sub="")
         app.logger.error("No matching students found")
-        return render_template("Home.html", error="No matching students found.")
+        return render_template("class.html", error="No matching students found.")
 
-    return render_template("Home.html")
+    return render_template("class.html")
+
+@app.route("/home")
+def home():
+    return render_template("Home.html", class_value=session.get("class_value",""),sub="")
 
 @app.route("/refresh", methods=["GET", "POST"])
 def refresh():
@@ -200,7 +207,7 @@ def refresh():
 
             total_marks = {row.roll_no: row.total for row in totals}
             return render_template(
-                "Student_data.html",
+                "Home.html",
                 class_value=class_value,
                 students=students,
                 total_marks=total_marks,
@@ -210,7 +217,7 @@ def refresh():
 
         if sub and exa:
             return render_template(
-                "Student_data.html",
+                "Home.html",
                 class_value=class_value,
                 students=students,
                 results=res,
@@ -366,14 +373,17 @@ def graph(roll_no:int,subject:str,exam_id:int):
         sns.despine(left=False, bottom=False)
 
         plt.tight_layout()
-        plt.show()
+        buffer = BytesIO()
 
-        return render_template("Student_data.html", 
-                               class_value=session.get("class_value"),
-                               students=students,
-                               results=res,
-                               sub=subject,
-                               exam=exam1) 
+        plt.savefig(buffer, format="png")
+
+        buffer.seek(0)
+
+        graph = base64.b64encode(buffer.getvalue()).decode()
+
+        plt.close()
+
+        return render_template("graph.html", graph=graph) 
 
 @app.route("/about")
 def about():
@@ -385,7 +395,7 @@ def support():
     
 @app.route("/profile")
 def profile():
-    return render_template("profile.html",username=session.get("username","").strip("@gmail.com"))
+    return render_template("profile.html",username=session.get("username","").removesuffix("@gmail.com"))
 
 @app.route("/log-out", methods=["POST", "GET"])
 def log_out():
@@ -453,10 +463,10 @@ def send_results():
     for stu in students:
         for mark in res:
             if stu.roll_no == mark.roll_no:
-                status = "Fail" if mark.marks <= 30 else "Pass"
+                status = "passed" if mark.marks > 30 else "failed"
                 msg = f"""Dear Parent/Guardian,
 
-This is to inform you that {stu.student_name} has scored {mark.marks} marks and {status}ed in {sub} for the {exa}.
+This is to inform you that {stu.student_name} has scored {mark.marks} marks and {status} in {sub} for the {exa}.
 We encourage you to review the student's progress and continue supporting their learning.
 Thank you for your cooperation.
 
@@ -470,8 +480,52 @@ School Administration"""
 
     return jsonify({"status": "success", "sent_count": sent_count})
 
+@app.route("/leaderboard", methods=["GET", "POST"])
+def leaderboard():
+        exa = request.form.get("exam", "")
+        class_value = session.get("class_value")
+        sec = session.get("sec") 
+        if exa:
+                if class_value is not None:
+
+                    students = Student.query.filter(
+                        Student.student_class == class_value
+                    ).all()
+
+                    exam = Exam.query.filter(Exam.exam_name == exa).first() if exa else None
+
+                    leaderboard =db.session.query(
+                                    Mark.roll_no,
+                                    func.sum(Mark.marks).label("total")
+                                ).filter(
+                                    Mark.student_class == class_value,
+                                    Mark.exam_id == exam.exam_id
+                                ).group_by(Mark.roll_no).order_by((func.sum(Mark.marks)).desc()).all()
+                            
+
+                    name_lookup = {stu.roll_no: stu.student_name for stu in students}
+                    podium = [
+                        {
+                            "rank": idx,
+                            "name": name_lookup.get(roll_no, "Unknown"),
+                            "marks": total
+                        }
+                        for idx, (roll_no, total) in enumerate(leaderboard[:3], start=1)
+                    ]
+
+                    total_marks = {row.roll_no: row.total for row in leaderboard[3:]}
+
+                    return render_template("leaderboard.html",
+                                class_value=class_value,
+                                students=students,
+                                total_marks=total_marks,
+                                podium=podium,
+                                sub="All",
+                                exam=exa
+                                )
+        return render_template("leaderboard.html",class_value=session.get("class_value",""))
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()
 
-    app.run(debug=True)#false if deploying
+    app.run(debug=True)#False if deploying True

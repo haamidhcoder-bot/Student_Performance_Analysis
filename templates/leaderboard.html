@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{%block head%}
+<title>Leaderboard</title>
+{%endblock%}
+
+{%block body%}
+<form action="/leaderboard" method="POST">
+    <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+            <h2 style="margin-bottom:0;">Class {{ class_value }} Leaderboard</h2>
+        </div>
+    <div class="filter-bar">
+        <div class="field">
+            <label for="exam">Exam</label>
+            <select name="exam" id="exam">
+                <option value="">Select Exam</option>
+                <option value="Unit Test 1">Unit Test 1</option>
+                <option value="Quarterly Exam">Quarterly Exam</option>
+                <option value="Half Yearly Exam">Half Yearly Exam</option>
+                <option value="Unit Test 2">Unit Test 2</option>
+                <option value="Annual Exam">Annual Exam</option>
+            </select>
+        
+            <div class="field" style="flex: 0 0 auto;">
+                <button type="submit" style="margin-top:0;" >Show results</button>
+            </div>
+        </div>
+    </div>
+</div>
+</form>
+{% if podium %}
+<div class="podium-wrap">
+    <div class="podium">
+        {% for entry in [podium[1] if podium|length > 1 else none,
+                          podium[0] if podium|length > 0 else none,
+                          podium[2] if podium|length > 2 else none] %}
+            {% if entry %}
+            <div class="podium-place place-{{ entry.rank }}">
+                <div class="podium-info">
+                    <span class="podium-name">{{ entry.name }}</span>
+                    <span class="podium-marks">{{ entry.marks }} marks</span>
+                </div>
+                <div class="podium-block">
+                    <span class="podium-rank">{{ entry.rank }}</span>
+                </div>
+            </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="podium-base"></div>
+</div>
+{% endif %}
+
+{% if sub == "All" %}
+        <h4>{{ exam }}</h4>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Student name</th>
+                    <th>Marks</th>
+                    <th>Percentage</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {%for i in total_marks%}
+                <tr>
+                    <td>{{ loop.index + 3 }}</td>
+                    {%for stu in students%}
+                    {%if i==stu.roll_no%}
+                    <td data-label="Student name" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}" id="{%if i==stu.roll_no%}in_class{%endif%}">{{ stu.student_name }}</td>
+                    <td data-label="Marks" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}" id="{%if i==stu.roll_no%}in_class{%endif%}">{{ total_marks.get(stu.roll_no, '') }}</td>
+                    <td  class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}" id="{%if i==stu.roll_no%}in_class{%endif%}">{{ (total_marks.get(stu.roll_no, '')/500)*100 }}</td>
+                    <td class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}" id="{%if i==stu.roll_no%}in_class{%endif%}">{% if total_marks.get(stu.roll_no, '') <= 150 %}Fail{%else%}Pass{% endif %}</td>
+                </tr>
+                
+                {%endif%}
+                {%endfor%}
+                {%endfor%}
+            </tbody>
+        </table>
+        {% else %}
+        <h4>There are no data to show</h4>
+        {% endif %}
+      </div>
+    </form>
+{%endblock%}

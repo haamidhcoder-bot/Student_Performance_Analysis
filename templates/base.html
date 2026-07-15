@@ -13,7 +13,7 @@
         <div class="brand">SCHOOL PERFORMANCE ANALYSIS</div>
   
         <nav>
-            <a href="/data" class="{% if request.path=='/data' %}active{% endif %}">
+            <a href="/home" class="{% if request.path=='/home' %}active{% endif %}">
                 <i class="fa-solid fa-house"></i> Home
             </a>
   
@@ -21,9 +21,14 @@
                 <i class="fa-solid fa-circle-info"></i> About Us
             </a>
   
+            <a href="/leaderboard" class="{% if request.path=='/leaderboard' %}active{% endif %}">
+                <i class="fa-solid fa-trophy"></i> Leaderboard
+            </a>
+
             <a href="/profile" class="{% if request.path=='/profile' %}active{% endif %}">
                 <i class="fa-solid fa-circle-user"></i>
             </a>
+
         </nav>
     </div>
     {%block body%}{%endblock%}

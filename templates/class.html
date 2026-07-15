@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card" style="max-width: 420px; margin: 60px auto;">
+          <h2 style="text-align:center;">Select class &amp; section</h2>
+          {% if error %}
+          <div class="alert alert-error">{{ error }}</div>
+          {% endif %}
+          <form action="/data" method="post">
+            <div class="filter-bar" style="background:none; border:none; padding:0; margin-bottom:0;">
+              <div class="field">
+                <label for="class">Class</label>
+                <input type="number" name="class" id="class" placeholder="Enter the class" min="1" max="12">
+              </div>
+              <div class="field">
+                <label for="sec">Section</label>
+                <select name="section" id="sec">
+                  <option value="A">A</option>
+                  <option value="B">B</option>
+                  <option value="C">C</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" style="width:100%;">Submit</button>
+          </form>
+        </div>
+      </div> 
+</body>
+</html>
