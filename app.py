@@ -476,6 +476,7 @@ School Administration"""
                     email(session.get("username", ""), stu.student_gmail, f"{sub}-{exa}-Marks", msg, PASSWORD)
                     sent_count += 1
                 except Exception as e:
+                    app.logger.error(e)
                     return jsonify({"status": "error", "message": f"{e}\nContact the developer"}), 500
 
     return jsonify({"status": "success", "sent_count": sent_count})
