@@ -124,20 +124,12 @@ def login_page():
         if request.method=="POST" and not session.get("logged_in",""):
             user_n=request.form.get("username","")
             pass_n=request.form.get("password","")
-            """try:
-                if session[user_n]:
-                  pass_n=session[user_n]
-            except:
-                pass_n=request.form.get("password","")"""
             session["username"]=user_n
             session["password"]=pass_n
-            remember=request.form.get("remember","")
             teachers=Teacher.query.filter(
                 Teacher.Gmail==user_n,
                 Teacher.password==pass_n
             ).first()
-            """if remember:
-                session[user_n]=pass_n"""
             if teachers:
                 session["logged_in"]=True
                 app.logger.info(f"{session.get("username","")} logged in")
