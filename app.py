@@ -121,7 +121,7 @@ class Mark(db.Model):
 
 @app.route("/",methods=["post","get"])
 def login_page():    
-        if request.method=="POST":
+        if request.method=="POST" and not session.get("logged_in",""):
             user_n=request.form.get("username","")
             pass_n=request.form.get("password","")
             """try:
@@ -139,11 +139,15 @@ def login_page():
             """if remember:
                 session[user_n]=pass_n"""
             if teachers:
+                session["logged_in"]=True
                 app.logger.info(f"{session.get("username","")} logged in")
-                return render_template("class.html")
+                return render_template("class.html",log=session.get("logged_in",""),user=session.get("username",""))
             else:
                 app.logger.error("incorrect username or password")
                 return render_template("Error.html",data=" incorrect username or password",location="/")
+        elif session.get("logged_in",""):
+                app.logger.info(f"{session.get("username","")} logged in back")
+                return render_template("class.html",log=session.get("logged_in",""),user=session.get("username",""))
         return render_template("login_page.html")
 
 
@@ -401,6 +405,7 @@ def profile():
 def log_out():
     app.logger.info(f"{session.get("username","")} has logged out")
     session.clear()
+    session["logged_in"]=False
     return redirect(url_for("login_page"))
 
 @app.route("/loading")

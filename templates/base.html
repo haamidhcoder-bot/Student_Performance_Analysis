@@ -17,14 +17,14 @@
                 <i class="fa-solid fa-house"></i> Home
             </a>
   
-            <a href="/about" class="{% if request.path=='/about' %}active{% endif %}">
-                <i class="fa-solid fa-circle-info"></i> About Us
-            </a>
-  
             <a href="/leaderboard" class="{% if request.path=='/leaderboard' %}active{% endif %}">
                 <i class="fa-solid fa-trophy"></i> Leaderboard
             </a>
-
+            
+            <a href="/about" class="{% if request.path=='/about' %}active{% endif %}">
+                <i class="fa-solid fa-circle-info"></i> About Us
+            </a>
+            
             <a href="/profile" class="{% if request.path=='/profile' %}active{% endif %}">
                 <i class="fa-solid fa-circle-user"></i>
             </a>
