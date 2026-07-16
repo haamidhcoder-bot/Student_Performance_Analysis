@@ -14,6 +14,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 from io import BytesIO
 import base64
+from random import randint
 
 cn = sql.connect(host='127.0.0.1', user='root', password=Mysql_pass)
 cr = cn.cursor()
