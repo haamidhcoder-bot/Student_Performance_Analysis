@@ -464,6 +464,50 @@ td.total-marks {
     margin-bottom: 16px;
 }
 
+/* ---------------- Table sort toolbar ---------------- */
+
+.table-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    margin-bottom: 8px;
+}
+
+.table-search {
+    flex: 1;
+    min-width: 220px;
+    max-width: 360px;
+}
+
+.sort-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+}
+
+.sort-controls select {
+    width: auto;
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
+.sort-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 0;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+}
+
+.sort-btn .sort-icon {
+    transition: transform 0.2s ease;
+}
+
 /* ---------------- Alerts / flash messages ---------------- */
 
 .alert {
@@ -673,7 +717,7 @@ nav a:hover i {
     .podium-marks { font-size: 0.75rem; }
 }
 
-/* HTML: <div class="loader"></div> */
+/* HTML: <div class="loader"></div> 
 .loader {
   width: 55px;
   aspect-ratio: 1;
@@ -693,4 +737,119 @@ nav a:hover i {
   50%  {background-size:15px 35px,35px 35px,35px 15px,15px 15px}
   75%  {background-size:15px 15px,35px 15px,35px 35px,15px 35px}
   100% {background-size:35px 15px,15px 15px,15px 35px,35px 35px}
-} 
+} */
+/* Container styling to center the loader */
+.mail-loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #f4f7f6;
+  padding: 40px;
+  border-radius: 12px;
+  width: 300px;
+  margin: 0 auto;
+}
+
+/* Scenery viewport for the inbox and flying letters */
+.scenery {
+  position: relative;
+  width: 200px;
+  height: 100px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+/* Inbox tray sits at the bottom center */
+.inbox {
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  width: 90px;
+  height: 60px;
+  transform: translateX(-50%);
+  z-index: 1;
+}
+
+/* Reusable flying letter shape */
+.letter {
+  position: absolute;
+  width: 26px;
+  height: 18px;
+  border-radius: 3px;
+  background: var(--primary-mid);
+  border: 1px solid var(--primary-dark);
+  top: 8px;
+  left: -30px;
+  z-index: 2;
+  animation: flyToInbox 1.8s ease-in infinite;
+}
+
+.letter::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    linear-gradient(135deg, transparent 49%, var(--primary-light) 50%, transparent 51%) top left / 100% 60% no-repeat,
+    linear-gradient(-135deg, transparent 49%, var(--primary-light) 50%, transparent 51%) top right / 100% 60% no-repeat;
+}
+
+.letter-1 { animation-delay: 0s; }
+.letter-2 { animation-delay: 0.6s; background: var(--accent); }
+.letter-3 { animation-delay: 1.2s; }
+
+/* Progress text styling */
+.loading-text {
+  color: #4b5563;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Animated dots effect */
+.loading-text span {
+  animation: blinkDots 1.4s infinite both;
+}
+.loading-text span:nth-child(2) { animation-delay: .2s; }
+.loading-text span:nth-child(3) { animation-delay: .4s; }
+
+/* --- Keyframe Animations --- */
+
+/* Letters travel left-to-right and dive down into the inbox tray, fading out on arrival */
+@keyframes flyToInbox {
+  0% {
+    left: -30px;
+    top: 8px;
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+  75% {
+    left: 75px;
+    top: 30px;
+    opacity: 1;
+    transform: rotate(8deg) scale(1);
+  }
+  95% {
+    left: 87px;
+    top: 46px;
+    opacity: 1;
+    transform: rotate(20deg) scale(0.7);
+  }
+  100% {
+    left: 87px;
+    top: 46px;
+    opacity: 0;
+    transform: rotate(20deg) scale(0.5);
+  }
+}
+
+/* Text dots pulsing timeline */
+@keyframes blinkDots {
+  0% { opacity: .2; }
+  20% { opacity: 1; }
+  100% { opacity: .2; }
+}

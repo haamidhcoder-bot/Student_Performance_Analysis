@@ -136,41 +136,27 @@ def login_page():
                 session["logged_in"]=True
             if teachers:
                 app.logger.info(f"{session.get("username","")} logged in")
-                return render_template("class.html")
+                return render_template(
+                    "Home.html",
+                    class_value=session.get("class_value", ""),
+                    sub="",
+                    sec=session.get("sec", "")
+                )
             else:
                 app.logger.error("incorrect username or password")
                 return render_template("Error.html",data=" incorrect username or password",location="/")
         elif session.get("logged_in",""):
                 app.logger.info(f"{session.get("username","")} logged in back")
-                return render_template("class.html",log=session.get("logged_in",""),user=session.get("username",""))
-        return render_template("login_page.html")
-
-
-@app.route("/data", methods=["GET", "POST"])
-def data():
-    if request.method == "POST":
-        class_value = request.form.get("class", "").strip()
-
-        if class_value:
-            try:
-                class_value = int(class_value)
-            except:
-                return render_template("class.html", error="Invalid class value.")
-            session["class_value"] = class_value
-            students = Student.query.filter(
-                Student.student_class == class_value
-            ).all()
-            if students:
                 return render_template(
                     "Home.html",
-                    class_value=class_value,
+                    class_value=session.get("class_value", ""),
                     sub="",
-                    sec=session.get("sec", "")
+                    sec=session.get("sec", ""),
+                    log=session.get("logged_in",""),
+                    user=session.get("username","")
                 )
-        app.logger.error("No matching students found")
-        return render_template("class.html", error="No matching students found.")
+        return render_template("login_page.html")
 
-    return render_template("class.html")
 
 @app.route("/home")
 def home():
@@ -183,8 +169,41 @@ def home():
 
 @app.route("/refresh", methods=["GET", "POST"])
 def refresh():
-    class_value = session.get("class_value")
-    if request.method == "POST" and class_value is not None:
+    if request.method == "POST":
+        class_input = request.form.get("class", "").strip()
+        if class_input:
+            try:
+                class_input = int(class_input)
+            except ValueError:
+                return render_template(
+                    "Home.html",
+                    class_value=session.get("class_value", ""),
+                    sub="",
+                    sec=session.get("sec", ""),
+                    error="Invalid class value."
+                )
+            students_exist = Student.query.filter(Student.student_class == class_input).first()
+            if not students_exist:
+                app.logger.error("No matching students found")
+                return render_template(
+                    "Home.html",
+                    class_value=session.get("class_value", ""),
+                    sub="",
+                    sec=session.get("sec", ""),
+                    error="No matching students found."
+                )
+            session["class_value"] = class_input
+
+        class_value = session.get("class_value")
+        if class_value is None:
+            return render_template(
+                "Home.html",
+                class_value="",
+                sub="",
+                sec=session.get("sec", ""),
+                error="Please select a class first."
+            )
+
         sec = request.form.get("section", "").strip() or session.get("sec", "")
         session["sec"] = sec
         sub = request.form.get("subject10", "") or request.form.get("subject12", "")
@@ -233,10 +252,18 @@ def refresh():
                 exam=exa,
                 sec=sec
             )
-        elif sub=="" and exa=="":
-            return render_template("Error.html",data="select the subject and exam",location="/data")
-    
-    return redirect("/data")
+
+        # Class was (re)selected but no subject/exam picked yet - show the
+        # empty state instead of erroring, since class selection now shares
+        # this same form.
+        return render_template(
+            "Home.html",
+            class_value=class_value,
+            sub="",
+            sec=sec
+        )
+
+    return redirect("/home")
 
 @app.route("/edit/<int:roll_no>/<string:subject>/<int:exam_id>", methods=["POST", "GET"])
 def edit(roll_no:int, subject:str,exam_id:int):
@@ -494,16 +521,36 @@ School Administration"""
 @app.route("/leaderboard", methods=["GET", "POST"])
 def leaderboard():
         exa = request.form.get("exam", "")
-        class_value = session.get("class_value")
-        sec = session.get("sec") 
-        if exa:
-                if class_value is not None:
+        class_input = request.form.get("class", "").strip()
 
+        if class_input:
+            try:
+                class_input = int(class_input)
+            except ValueError:
+                return render_template(
+                    "leaderboard.html",
+                    class_value=session.get("class_value", ""),
+                    error="Invalid class value."
+                )
+            students_exist = Student.query.filter(Student.student_class == class_input).first()
+            if not students_exist:
+                return render_template(
+                    "leaderboard.html",
+                    class_value=session.get("class_value", ""),
+                    error="No matching students found."
+                )
+            session["class_value"] = class_input
+
+        class_value = session.get("class_value")
+
+        if exa and class_value is not None:
                     students = Student.query.filter(
                         Student.student_class == class_value
                     ).all()
 
-                    exam = Exam.query.filter(Exam.exam_name == exa).first() if exa else None
+                    exam = Exam.query.filter(Exam.exam_name == exa).first()
+                    if exam is None:
+                        return render_template("leaderboard.html", class_value=class_value)
 
                     leaderboard =db.session.query(
                                     Mark.roll_no,
@@ -534,7 +581,7 @@ def leaderboard():
                                 sub="All",
                                 exam=exa
                                 )
-        return render_template("leaderboard.html",class_value=session.get("class_value",""))
+        return render_template("leaderboard.html", class_value=class_value if class_value is not None else "")
 if __name__ == "__main__":
     with app.app_context():
         db.create_all()

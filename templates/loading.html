@@ -8,12 +8,29 @@
 <div class="container">
     <div class="card" style="text-align:center; padding:60px 32px;">
         <center>
-            <div class="loader"></div>
+            <div class="mail-loader-container">
+                <div class="scenery">
+                  <!-- Inbox tray -->
+                  <svg class="inbox" viewBox="0 0 60 40" fill="none">
+                    <path d="M2 18 L16 18 L22 26 L38 26 L44 18 L58 18 L58 36 Q58 38 56 38 L4 38 Q2 38 2 36 Z" style="fill: var(--primary-pale); stroke: var(--primary);" stroke-width="2" stroke-linejoin="round"/>
+                  </svg>
+
+                  <!-- Flying letters -->
+                  <div class="letter letter-1"></div>
+                  <div class="letter letter-2"></div>
+                  <div class="letter letter-3"></div>
+                </div>
+                <p class="loading-text">Sending Email<span>.</span><span>.</span><span>.</span></p>
+              </div>
+              
         </center> 
         <h2 id="loadingTitle">Sending results to parents…</h2>
         <p style="color: var(--text-muted);">
             Please don't close or refresh this page while emails are being sent.
         </p>
+        <button type="button" id="cancelSendBtn" class="cancel-btn">
+            Cancel
+        </button>
     </div>
 </div>
 
@@ -29,6 +46,17 @@
 }
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+.cancel-btn {
+    background: var(--white);
+    color: var(--error);
+    border: 1px solid var(--error);
+    transition: background-color 0.15s, color 0.15s;
+}
+.cancel-btn:hover {
+    background: var(--error);
+    color: var(--white);
 }
 </style>
 
@@ -51,9 +79,23 @@
         formData.append("subject12", sub);
         formData.append("exam12", exam);
 
+        var controller = new AbortController();
+        var cancelled = false;
+
+        var cancelBtn = document.getElementById("cancelSendBtn");
+        cancelBtn.addEventListener("click", function () {
+            if (cancelled) return;
+            cancelled = true;
+            controller.abort();
+            cancelBtn.disabled = true;
+            cancelBtn.textContent = "Cancelling…";
+            window.location.href = "/home";
+        });
+
         fetch("/send_results", {
             method: "POST",
-            body: formData
+            body: formData,
+            signal: controller.signal
         })
         .then(function (res) {
             return res.json().then(function (data) {
@@ -61,6 +103,7 @@
             });
         })
         .then(function (result) {
+            if (cancelled) return;
             if (result.ok && result.data.status === "success") {
                 var successParams = new URLSearchParams({
                     sent: result.data.sent_count,
@@ -74,6 +117,7 @@
             }
         })
         .catch(function (err) {
+            if (cancelled || err.name === "AbortError") return;
             window.location.href = "/error_page?msg=" + encodeURIComponent("Network error: " + err.message);
         });
     })();
