@@ -4,3 +4,4 @@ __pycache__/
 config.py
 app.log
 outline.txt
+original_app.py
