@@ -48,4 +48,4 @@ def log_out():
     current_app.logger.info(f"{session.get('username', '')} has logged out")
     session.clear()
     session["logged_in"] = False
-    return redirect(url_for("login_page"))
+    return redirect(url_for("auth.login_page"))
