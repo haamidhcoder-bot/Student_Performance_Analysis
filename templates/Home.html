@@ -55,26 +55,25 @@
 </style>
 {% endif %}
 <div class="container">
-    <form action="/refresh" method="POST">
+    <form action="/show_results" method="POST">
       <div class="card">
-        <div style="display:flex; align-items:center; justify-content:space-between;">
-            <h2 style="margin-bottom:0;">
-                {% if class_value %}Class {{ class_value }}{% if sec %} - Section {{ sec }}{% endif %} results{% else %}Select a class{% endif %}
+          <div class="field" style="float: right;">
+              <button type="submit" style="margin-top:0;border-radius: 50% / 50%;" formaction="/refresh">⟳</button>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+              <h2 style="margin-bottom:0;">
+                  {% if class_value %}Class {{ class_value }}{% if sec %} - Section {{ sec }}{% endif %} results{% else %}Select a class{% endif %}
             </h2>
         </div>
 
-        {% if error %}
-        <div class="alert alert-error">{{ error }}</div>
-        {% endif %}
-
         <div class="filter-bar">
-        <div class="field">
-            <label for="class">Class</label>
-            <input type="number" name="class" id="class" placeholder="Enter class" min="1" max="12" value="{{ class_value or '' }}">
-        </div>
-        {% if class_value %}
-        <div class="field">
-            <label for="sec">Section</label>
+            <div class="field">
+                <label for="class">Class</label>
+                <input type="number" name="class" id="class" placeholder="Enter class" min="1" max="12" value="{{ class_value or '' }}" default="1">
+            </div>
+            {% if class_value %}
+            <div class="field">
+                <label for="sec">Section</label>
             <select name="section" id="sec">
                 <option value="A" {% if sec == "A" %}selected{% endif %}>A</option>
                 <option value="B" {% if sec == "B" %}selected{% endif %}>B</option>
@@ -86,57 +85,46 @@
             <label for="sub1">Subject</label>
             <select name="subject10" id="sub1">
                 <option value="">Select Subject</option>
-                <option value="English">English</option>
-                <option value="Maths">Maths</option>
-                <option value="Social">Social</option>
-                <option value="Science">Science</option>
-                <option value="Tamil">Tamil</option>
-                <option value="All">All Subjects</option>
+                <option value="English" {% if sub == "English" %}selected{% endif %}>English</option>
+                <option value="Maths" {% if sub == "Maths" %}selected{% endif %}>Maths</option>
+                <option value="Social" {% if sub == "Social" %}selected{% endif %}>Social</option>
+                <option value="Science" {% if sub == "Science" %}selected{% endif %}>Science</option>
+                <option value="Tamil" {% if sub == "Tamil" %}selected{% endif %}>Tamil</option>
+                <option value="All" {% if sub == "All" %}selected{% endif %}>All Subjects</option>
             </select>
         </div>
 
-        <div class="field">
-            <label for="exam">Exam</label>
-            <select name="exam10" id="exam">
-                <option value="">Select Exam</option>
-                <option value="Unit Test 1">Unit Test 1</option>
-                <option value="Quarterly Exam">Quarterly Exam</option>
-                <option value="Half Yearly Exam">Half Yearly Exam</option>
-                <option value="Unit Test 2">Unit Test 2</option>
-                <option value="Annual Exam">Annual Exam</option>
-            </select>
-        </div>
         {% else %}
         <div class="field">
             <label for="sub2">Subject</label>
             <select name="subject12" id="sub2">
-                <option value="">Select subject</option>
-                <option value="English">English</option>
-                <option value="Maths">Maths</option>
-                <option value="Physics">Physics</option>
-                <option value="Chemistry">Chemistry</option>
-                <option value="Biology">Biology</option>
-                <option value="All">All Subjects</option>
+                <option value="">Select Subject</option>
+                <option value="English" {% if sub == "English" %}selected{% endif %}>English</option>
+                <option value="Maths" {% if sub == "Maths" %}selected{% endif %}>Maths</option>
+                <option value="Physics" {% if sub == "Physics" %}selected{% endif %}>Physics</option>
+                <option value="Chemistry" {% if sub == "Chemistry" %}selected{% endif %}>Chemistry</option>
+                <option value="Biology" {% if sub == "Biology" %}selected{% endif %}>Biology</option>
+                <option value="All" {% if sub == "All" %}selected{% endif %}>All Subjects</option>
             </select>
         </div>
 
+        {% endif %}
         <div class="field">
-            <label for="exam2">Exam</label>
-            <select name="exam12" id="exam2">
+            <label for="exam">Exam</label>
+            <select name="exam" id="exam" >
                 <option value="">Select Exam</option>
-                <option value="Unit Test 1">Unit Test 1</option>
-                <option value="Quarterly Exam">Quarterly Exam</option>
-                <option value="Half Yearly Exam">Half Yearly Exam</option>
-                <option value="Unit Test 2">Unit Test 2</option>
-                <option value="Annual Exam">Annual Exam</option>
+                <option value="Unit Test 1" {% if exam == "Unit Test 1" %}selected{% endif %}>Unit Test 1</option>
+                <option value="Unit Test 2" {% if exam == "Unit Test 2" %}selected{% endif %}>Unit Test 2</option>
+                <option value="Quarterly Exam" {% if exam == "Quarterly Exam" %}selected{% endif %}>Quarterly Exam</option>
+                <option value="Half Yearly Exam" {% if exam == "Half Yearly Exam" %}selected{% endif %}>Half Yearly Exam</option>
+                <option value="Annual Exam" {% if exam == "Annual Exam" %}selected{% endif %}>Annual Exam</option>
             </select>
         </div>
         {% endif %}
-        {% endif %}
+        {% if class_value %}
         <div class="field" style="flex: 0 0 auto;">
             <button type="submit" style="margin-top:0;">Show results</button>
         </div>
-        {% if class_value %}
         <div class="field" style="flex: 0 0 auto;">
             <button type="button" id="sendResultsBtn">
                 Send Results
@@ -174,12 +162,12 @@
             </thead>
             <tbody>
                 {% for stu in students %}
-                <tr data-roll="{{ stu.roll_no }}" data-marks="{{ total_marks.get(stu.roll_no, 0) }}" data-name="{{ stu.student_name|lower }}" data-result="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% else %}pass{% endif %}">
-                    <td data-label="Roll no" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ stu.roll_no }}</td>
-                    <td data-label="Student name" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ stu.student_name }}</td>
-                    <td data-label="Marks" class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ total_marks.get(stu.roll_no, '') }}</td>
-                    <td  class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{{ (total_marks.get(stu.roll_no, '')/500)*100 }}</td>
-                    <td class="{% if total_marks.get(stu.roll_no, '') <= 150 %}fail{% endif %}">{% if total_marks.get(stu.roll_no, '') <= 150 %}Fail{%else%}Pass{% endif %}</td>
+                <tr data-roll="{{ stu.roll_no }}" data-marks="{{ total_marks.get(stu.roll_no, 0) }}" data-name="{{ stu.student_name|lower }}" data-result="{% if total_marks.get(stu.roll_no, 0) <= 150 %}fail{% else %}pass{% endif %}">
+                    <td data-label="Roll no" class="{% if total_marks.get(stu.roll_no, 0) <= 150 %}fail{% endif %}">{{ stu.roll_no }}</td>
+                    <td data-label="Student name" class="{% if total_marks.get(stu.roll_no, 0) <= 150 %}fail{% endif %}">{{ stu.student_name }}</td>
+                    <td data-label="Marks" class="{% if total_marks.get(stu.roll_no, 0) <= 150 %}fail{% endif %}">{{ total_marks.get(stu.roll_no, 0) }}</td>
+                    <td  class="{% if total_marks.get(stu.roll_no, 0) <= 150 %}fail{% endif %}">{{ "%.2f"|format((total_marks.get(stu.roll_no, 0)/500)*100) }}</td>
+                    <td class="{% if total_marks.get(stu.roll_no, 0) <= 150 %}fail{% endif %}">{% if total_marks.get(stu.roll_no, 0) <= 150 %}Fail{%else%}Pass{% endif %}</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -292,6 +280,8 @@
             sendBtn.addEventListener("click", function () {
                 // Whichever field set is present in the DOM (class <=10 vs >10)
                 var subEl = document.getElementById("sub1") || document.getElementById("sub2");
+                // Note: both class<=10 and class>10 exam <select> elements use id="exam",
+                // so this always matches on the first getElementById call; "exam2" is unused.
                 var examEl = document.getElementById("exam") || document.getElementById("exam2");
 
                 var sub = subEl ? subEl.value : "";

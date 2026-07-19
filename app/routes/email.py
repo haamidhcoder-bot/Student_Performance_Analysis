@@ -44,7 +44,7 @@ def send_results():
     class_value = session.get("class_value")
     sec = session.get("sec")
     sub = request.form.get("subject10", "") or request.form.get("subject12", "")
-    exa = request.form.get("exam10", "") or request.form.get("exam12", "")
+    exa = request.form.get("exam", "")
 
     if not sub or not exa or class_value is None:
         return jsonify({"status": "error", "message": "Missing subject, exam, or class information."}), 400

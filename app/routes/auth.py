@@ -43,7 +43,7 @@ def login_page():
     return render_template("login_page.html")
 
 
-@auth_bp.route("/log-out", methods=["POST", "GET"], endpoint="log_out")
+@auth_bp.route("/log-out", methods=["POST", "GET"])
 def log_out():
     current_app.logger.info(f"{session.get('username', '')} has logged out")
     session.clear()
