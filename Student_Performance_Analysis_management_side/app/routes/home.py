@@ -3,6 +3,7 @@ from sqlalchemy import func
 
 from app.extensions import db
 from app.models.student import Student
+from app.models.teacher import Teacher
 
 home_bp = Blueprint("home", __name__)
 
@@ -14,7 +15,7 @@ def home():
 
 
     if not class_value:
-        return render_template("Home.html", class_value=None, sub="")
+        return render_template("Home.html", class_value=None)
 
     students = Student.query.filter(
         Student.student_class == class_value,
@@ -49,16 +50,7 @@ def refresh():
 
         sec = request.form.get("section", "").strip() or session.get("sec", "")
         session["sec"] = sec
-        sub = request.form.get("subject10", "") or request.form.get("subject12", "")
-        exa = request.form.get("exam", "") 
-        students = Student.query.filter(
-            Student.student_class == class_value,
-            Student.section == sec
-        ).all()
 
-        # Class was (re)selected but no subject/exam picked yet - show the
-        # empty state instead of erroring, since class selection now shares
-        # this same form.
         return render_template(
             "Home.html",
             class_value=class_value,
@@ -87,11 +79,17 @@ def show_students():
         class_value = session.get("class_value")
         if class_value is None:
                 return render_template("Error.html",data="select a class first", location="/home")
-
+        log1=True
         return render_template(
                 "Home.html",
                 class_value=class_value,
                 sec=sec,
-                students=students_exist
+                students=students_exist,
+                log1=log1
             )
     return redirect("/home")
+
+@home_bp.route("/teachers_data", methods=["GET", "POST"], endpoint="/teachers_data",)
+def teachers_data():
+    teachers=Teacher.query.all() 
+    return render_template("teachers_data.html",teachers=teachers)

@@ -134,7 +134,7 @@
 
         {% if not class_value and not sec%}
         <h4>Enter a class above to get started.</h4>
-        {% elif class_value%}
+        {% elif log1 %}
         <div class="table-toolbar">
             <input type="text" id="searchSub" class="table-search" placeholder="Search by name, roll no, marks, or result" oninput="filterTable('tableSub','searchSub')">
             <div class="sort-controls">
@@ -174,5 +174,90 @@
       </div>
     </form>
     </div>
+    <script>
+      function filterTable(tableId, searchId) {
+          var table = document.getElementById(tableId);
+          var search = document.getElementById(searchId);
+          if (!table || !search) return;
 
+          var query = search.value.trim().toLowerCase();
+          var rows = table.querySelectorAll("tbody tr");
+
+          rows.forEach(function (row) {
+              var haystack = [
+                  row.getAttribute("data-name") || "",
+                  row.getAttribute("data-roll") || "",
+                  row.getAttribute("data-marks") || "",
+                  row.getAttribute("data-result") || ""
+              ].join(" ");
+
+              row.style.display = haystack.indexOf(query) !== -1 ? "" : "none";
+          });
+      }
+
+      function sortTable(tableId, selectId, buttonId) {
+          var table = document.getElementById(tableId);
+          var select = document.getElementById(selectId);
+          var button = document.getElementById(buttonId);
+          if (!table || !select || !button) return;
+
+          var tbody = table.querySelector("tbody");
+          var rows = Array.prototype.slice.call(tbody.querySelectorAll("tr"));
+          var key = select.value;
+
+          table.sortState = table.sortState || {};
+          var ascending = table.sortState[key] !== "asc";
+          table.sortState[key] = ascending ? "asc" : "desc";
+
+          rows.sort(function (a, b) {
+              var av = parseFloat(a.getAttribute("data-" + key)) || 0;
+              var bv = parseFloat(b.getAttribute("data-" + key)) || 0;
+              return ascending ? av - bv : bv - av;
+          });
+
+          rows.forEach(function (row) {
+              tbody.appendChild(row);
+          });
+
+          var icon = button.querySelector(".sort-icon");
+          if (icon) {
+              icon.style.transform = ascending ? "rotate(0deg)" : "rotate(180deg)";
+          }
+          button.setAttribute("aria-label", ascending ? "Sorted ascending" : "Sorted descending");
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+          var sendBtn = document.getElementById("sendResultsBtn");
+          if (!sendBtn) return;
+
+          sendBtn.addEventListener("click", function () {
+              // Whichever field set is present in the DOM (class <=10 vs >10)
+              var subEl = document.getElementById("sub1") || document.getElementById("sub2");
+              // Note: both class<=10 and class>10 exam <select> elements use id="exam",
+              // so this always matches on the first getElementById call; "exam2" is unused.
+              var examEl = document.getElementById("exam") || document.getElementById("exam2");
+
+              var sub = subEl ? subEl.value : "";
+              var exam = examEl ? examEl.value : "";
+
+              if (!sub || !exam) {
+                  document.getElementById("sendResultsValidationModal").style.display = "flex";
+                  return;
+              }
+
+              // Show a confirmation modal instead of sending right away.
+              document.getElementById("sendResultsConfirmBody").textContent =
+                  "Send " + sub + " results for " + exam + " to parents?";
+              document.getElementById("sendResultsConfirmModal").style.display = "flex";
+
+              var confirmBtn = document.getElementById("sendResultsConfirmBtn");
+              // Avoid stacking duplicate listeners if the user opens the modal more than once.
+              confirmBtn.onclick = function () {
+                  document.getElementById("sendResultsConfirmModal").style.display = "none";
+                  var params = new URLSearchParams({ sub: sub, exam: exam });
+                  window.location.href = "/loading?" + params.toString();
+              };
+          });
+      });
+  </script>
 {%endblock%}

@@ -13,12 +13,12 @@
         <div class="brand">SCHOOL PERFORMANCE ANALYSIS (MANAGEMENT)</div>
   
         <nav>
-            <a href="/home" class="{% if request.path=='/home'or  request.path=='/show_students' %}active{% endif %}">
+            <a href="/home" class="{% if request.path=='/' or  request.path=='/show_students' or  request.path=='/home'%}active{% endif %}">
                 <i class="fa-solid fa-house"></i> Home
             </a>
   
             <a href="/teachers_data" class="{% if request.path=='/teachers_data' %}active{% endif %}">
-                <i class="fa-solid fa-trophy"></i> Teachers
+                <i class="fa-solid fa-users"></i> Teachers
             </a>
             
             <a href="/about" class="{% if request.path=='/about' %}active{% endif %}">

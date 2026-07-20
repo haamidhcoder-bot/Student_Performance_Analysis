@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{%block head%}
+<title>Teachers</title>
+{%endblock%}
+
+{%block body%}
+<div class="container">
+    <div class="card">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <h2 style="margin-bottom:0;">Teachers Details</h2>
+                <span class="teacher-count-badge">{{ teachers|length }} total</span>
+            </div>
+            <a href="{{ url_for('pages.add_teacher') }}" class="btn">+ Add Teacher</a>
+        </div>
+
+        <div class="table-toolbar">
+            <div class="table-search">
+                <input type="text" id="teacherSearch" placeholder="Search by teacher name or email...">
+            </div>
+        </div>
+
+        <table id="tableSub">
+            <thead>
+                <tr>
+                    <th>Teacher</th>
+                    <th>Password</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tech in teachers %}
+                <tr>
+                    <td data-label="Teacher">
+                        <div class="teacher-cell">
+                            <div class="teacher-avatar">{{ tech.Gmail[0]|upper }}</div>
+                            <span class="teacher-email">{{ tech.Gmail }}</span>
+                        </div>
+                    </td>
+                    <td data-label="Password">
+                        <div class="password-cell">
+                            <span class="password-mask" data-password="{{ tech.password }}">••••••••</span>
+                            <button type="button" class="password-toggle" aria-label="Show password">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td>
+                        <a href="/edit">Edit</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="2" style="text-align:center; color:var(--text-muted); padding:30px;">
+                        No teachers added yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Live search filter
+    const searchInput = document.getElementById('teacherSearch');
+    const rows = document.querySelectorAll('#tableSub tbody tr');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const term = this.value.trim().toLowerCase();
+            rows.forEach(function (row) {
+                const emailEl = row.querySelector('.teacher-email');
+                if (!emailEl) return; // skip empty-state row
+                const match = emailEl.textContent.toLowerCase().includes(term);
+                row.style.display = match ? '' : 'none';
+            });
+        });
+    }
+
+    // Show/hide password toggle
+document.querySelectorAll('.password-toggle').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+        const mask = btn.previousElementSibling;
+        const icon = btn.querySelector('i');
+        const isHidden = mask.textContent.includes('•');
+
+        if (isHidden) {
+            mask.textContent = mask.dataset.password;
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+            btn.setAttribute('aria-label', 'Hide password');
+        } else {
+            mask.textContent = '••••••••';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+            btn.setAttribute('aria-label', 'Show password');
+        }
+    });
+});
+});
+</script>
+{%endblock%}

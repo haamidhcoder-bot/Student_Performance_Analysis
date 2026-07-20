@@ -25,7 +25,6 @@ def login_page():
             return render_template(
                 "Home.html",
                 class_value=int(session.get("class_value", 0)),
-                sub="",
                 sec=session.get("sec", "")
             )
         else:
@@ -36,7 +35,6 @@ def login_page():
         return render_template(
             "Home.html",
             class_value=int(session.get("class_value", 0)),
-            sub="",
             sec=session.get("sec", ""),
             log=session.get("logged_in", ""),
             user=session.get("username", "")
@@ -61,7 +59,7 @@ def register():
         if not username or not password or not confirm_password:
             return render_template("Error.html", data="Please fill in all fields.",location="/")
         
-        verification=create_account(user=username,password=password,confirm_password=confirm_password)
+        verification=create_account(user=username,password=password,confirm_password=confirm_password,Table=Admin)
 
         if not verification:
             return render_template("Error.html", data="Passwords do not match.",location="/")

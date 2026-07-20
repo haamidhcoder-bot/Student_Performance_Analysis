@@ -3,10 +3,10 @@ import re
 from app.models.Administration import Admin
 from app.extensions import db
 
-def create_account(user,password,confirm_password):
+def create_account(user,password,confirm_password,Table):
     pattern="^(?=.*[0-9])"
     if password==confirm_password and re.match(pattern,password):
-        new_admin=Admin(Gmail=user,password=password)
+        new_admin=Table(Gmail=user,password=password)
         try:
            db.session.add(new_admin)
            db.session.commit()

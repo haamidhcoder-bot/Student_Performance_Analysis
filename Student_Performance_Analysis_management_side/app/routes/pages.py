@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, session, request, redirect, url_fo
 
 from app.extensions import db
 from app.models import Teacher
+from app.services.create_account_service import create_account
 
 pages_bp = Blueprint("pages", __name__)
 
@@ -48,3 +49,22 @@ def profile():
 @pages_bp.route("/register",endpoint="register")
 def register():
     return render_template("register.html")
+
+@pages_bp.route("/add_teacher",endpoint="add_teacher")
+def add_teacher():
+        if request.method == "POST":
+            username = request.form.get("username", "").strip()
+            password = request.form.get("password", "").strip()
+            confirm_password = request.form.get("confirm_password", "").strip()
+
+            if not username or not password or not confirm_password:
+                return render_template("Error.html", data="Please fill in all fields.",location="/")
+            
+            verification=create_account(user=username,password=password,confirm_password=confirm_password,Table=Teacher)
+
+            if not verification:
+                return render_template("Error.html", data="Passwords do not match.",location="/")
+            
+            if verification:
+                return redirect("/teachers_data")
+        return render_template("add_teacher.html")

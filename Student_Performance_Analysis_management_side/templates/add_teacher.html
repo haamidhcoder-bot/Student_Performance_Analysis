@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Teacher</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="card edit-form">
+            <h2>Add Teacher</h2>
+            <form action="add_teacher" method="post">
+                <input type="email" name="username" class="icon-email" placeholder="Email ID" required>
+                <input type="password" name="password" class="icon-password" placeholder="Password" required>
+                <input type="password" name="confirm_password" class="icon-password" placeholder="Confirm Password" required>
+                <button type="submit" class="login-btn">Add Teacher</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

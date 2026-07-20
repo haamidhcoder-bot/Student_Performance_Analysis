@@ -280,6 +280,7 @@ form label {
 }
 
 input[type="text"],
+input[type="email"],
 input[type="password"],
 input[type="number"],
 select {
@@ -291,6 +292,7 @@ select {
     color: var(--text-dark);
     background: var(--primary-pale);
     transition: border-color 0.15s, box-shadow 0.15s;
+    margin-bottom: 15px;
 }
 
 input:focus,
@@ -508,6 +510,55 @@ td.total-marks {
     transition: transform 0.2s ease;
 }
 
+/* ---------------- Teachers page ---------------- */
+
+.teacher-count-badge {
+    background: var(--primary-pale);
+    color: var(--primary-dark);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.teacher-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.teacher-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: linear-gradient(160deg, var(--primary-mid) 0%, var(--primary-dark) 100%);
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+.teacher-email {
+    font-weight: 500;
+    color: var(--text-dark);
+}
+
+.password-toggle {
+    background-color: transparent;
+    color: var(--primary);
+    font-size: 1rem;
+    padding: 6px;
+}
+
+.password-toggle:hover {
+    background-color: transparent;
+    color: var(--primary-dark);
+    opacity: 1;
+}
 /* ---------------- Alerts / flash messages ---------------- */
 
 .alert {
