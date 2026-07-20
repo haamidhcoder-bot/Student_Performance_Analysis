@@ -8,9 +8,7 @@
 <div class="container">
     <form action="/leaderboard" method="POST">
         <div class="card">
-            <div class="field" style="float: right;">
-                <button type="submit" style="margin-top:0;border-radius: 50% / 50%;" formaction="/show_leaderboard">⟳</button>
-            </div>
+
             <div style="display:flex; align-items:center; justify-content:space-between;">
                 <h2 style="margin-bottom:0;">{% if class_value %}Class {{ class_value }} Leaderboard{% else %}Select a class{% endif %}</h2>
             </div>
@@ -20,7 +18,7 @@
                     <label for="class">Class</label>
                     <input type="number" name="class" id="class" placeholder="Enter class" min="1" max="12" value="{{ class_value or '' }}">
                 </div>
-                {% if class_value %}
+
                 <div class="field">
                     <label for="exam">Exam</label>
                     <select name="exam" id="exam" >
@@ -32,7 +30,7 @@
                         <option value="Annual Exam" {% if exam == "Annual Exam" %}selected{% endif %}>Annual Exam</option>
                     </select>
                 </div>
-                {% endif %}
+
                 <div class="field" style="flex: 0 0 auto; align-self:flex-end;">
                     <button type="submit" style="margin-top:0;">Show Leaderboard</button>
                 </div>

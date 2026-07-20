@@ -9,11 +9,56 @@ home_bp = Blueprint("home", __name__)
 
 @home_bp.route("/home", endpoint="home", strict_slashes=False)
 def home():
+    class_value = int(session.get("class_value", 0)) or None
+    sec = session.get("sec", "")
+    sub = session.get("subject", "")
+    exa = session.get("exam", "")
+
+    if not class_value:
+        return render_template("Home.html", class_value=None, sub="", sec="", exam="")
+
+    students = Student.query.filter(
+        Student.student_class == class_value,
+        Student.section == sec
+    ).all()
+
+    exam = Exam.query.filter(Exam.exam_name == exa).first() if exa else None
+    res = []
+    if exam is not None and sub and exa:
+        res = Mark.query.filter(
+            Mark.student_class == class_value,
+            Mark.exam_id == exam.exam_id,
+            Mark.subject == sub
+        ).all()
+
+    if sub == "All" and exam is not None:
+        totals = db.session.query(
+            Mark.roll_no,
+            func.sum(Mark.marks).label("total")
+        ).filter(
+            Mark.student_class == class_value,
+            Mark.exam_id == exam.exam_id
+        ).group_by(Mark.roll_no).all()
+
+        total_marks = {row.roll_no: row.total for row in totals}
+        return render_template(
+            "Home.html",
+            class_value=class_value,
+            students=students,
+            total_marks=total_marks,
+            sub=sub,
+            exam=exa,
+            sec=sec
+        )
+
     return render_template(
         "Home.html",
-        class_value=int(session.get("class_value", 0)),
-        sub="",
-        sec=session.get("sec", "")
+        class_value=class_value,
+        students=students,
+        results=res,
+        sub=sub,
+        exam=exa,
+        sec=sec
     )
 
 
@@ -154,7 +199,8 @@ def show_results():
                 sec=sec
             )
 
-        if sub and exa is not None:
+        if sub and exa :
+            session["class_value"],session["subject"],session["sec"],session["exam"] = class_input,sub,sec,exa
             return render_template(
                 "Home.html",
                 class_value=class_value,

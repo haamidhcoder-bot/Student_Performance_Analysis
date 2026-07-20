@@ -23,7 +23,7 @@ def login_page():
             current_app.logger.info(f"{session.get('username', '')} logged in")
             return render_template(
                 "Home.html",
-                class_value=session.get("class_value", ""),
+                class_value=int(session.get("class_value", 0)),
                 sub="",
                 sec=session.get("sec", "")
             )
@@ -34,7 +34,7 @@ def login_page():
         current_app.logger.info(f"{session.get('username', '')} logged in back")
         return render_template(
             "Home.html",
-            class_value=session.get("class_value", ""),
+            class_value=int(session.get("class_value", 0)),
             sub="",
             sec=session.get("sec", ""),
             log=session.get("logged_in", ""),

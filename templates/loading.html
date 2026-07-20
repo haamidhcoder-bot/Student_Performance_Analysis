@@ -71,13 +71,12 @@
             return;
         }
 
-        // Backend accepts either the class<=10 or class>10 field names,
-        // so we send both to be safe.
+        // Backend accepts either the class<=10 or class>10 subject field names,
+        // so we send both to be safe. Exam field name is the same for both classes.
         var formData = new FormData();
         formData.append("subject10", sub);
-        formData.append("exam10", exam);
         formData.append("subject12", sub);
-        formData.append("exam12", exam);
+        formData.append("exam", exam);
 
         var controller = new AbortController();
         var cancelled = false;
