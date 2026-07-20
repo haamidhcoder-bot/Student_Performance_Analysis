@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, redirect, request, session, url_for, current_app
 
 from werkzeug.security import generate_password_hash, check_password_hash
-from app.models import Teacher
+from app.models.Administration import Admin
+from app.services.create_account_service import create_account
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -13,13 +14,13 @@ def login_page():
         pass_n =request.form.get("password", "")
         session["username"] = user_n
         remember = request.form.get("remember", "")
-        teachers = Teacher.query.filter(
-            Teacher.Gmail == user_n,
-            Teacher.password==pass_n
+        Admins = Admin.query.filter(
+            Admin.Gmail == user_n,
+            Admin.password==pass_n
         ).first()
-        if remember and teachers:
+        if remember and Admins:
             session["logged_in"] = True
-        if teachers:# and check_password_hash(Teacher.password==pass_n):#for working of password hashing the password saved in database should be in the same hashing
+        if Admins:# and check_password_hash(Admin.password==pass_n):#for working of password hashing the password saved in database should be in the same hashing
             current_app.logger.info(f"{session.get('username', '')} logged in")
             return render_template(
                 "Home.html",
@@ -49,3 +50,20 @@ def log_out():
     session.clear()
     session["logged_in"] = False
     return redirect(url_for("auth.login_page"))
+
+@auth_bp.route("/register", methods=["POST", "GET"])
+def register():
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
+        confirm_password = request.form.get("confirm_password", "").strip()
+
+        if not username or not password or not confirm_password:
+            return render_template("Error.html", data="Please fill in all fields.",location="/")
+        
+        verification=create_account(user=username,password=password,confirm_password=confirm_password)
+
+        if not verification:
+            return render_template("Error.html", data="Passwords do not match.",location="/")
+        
+    return render_template("register.html")

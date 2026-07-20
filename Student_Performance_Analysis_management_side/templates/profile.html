@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{%block head%}
+<title>Profile</title>
+{%endblock%}
+
+{%block body%}
+<table>
+    <thead>
+        <tr>
+            <th>Username</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>{{username}}</td>
+        </tr>
+    </tbody>
+</table>
+<center>
+    <form class="exit" action="/log-out">
+        <button type="submit">Log Out</button>
+    </form>
+</center>
+{%endblock%}

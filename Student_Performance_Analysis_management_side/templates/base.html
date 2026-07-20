@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    {%block head%}<!--jinga-->{%endblock%}
+</head>
+<body>
+    <div class="navbar">
+        <div class="brand">SCHOOL PERFORMANCE ANALYSIS (MANAGEMENT)</div>
+  
+        <nav>
+            <a href="/home" class="{% if request.path=='/home'or  request.path=='/show_students' %}active{% endif %}">
+                <i class="fa-solid fa-house"></i> Home
+            </a>
+  
+            <a href="/teachers_data" class="{% if request.path=='/teachers_data' %}active{% endif %}">
+                <i class="fa-solid fa-trophy"></i> Teachers
+            </a>
+            
+            <a href="/about" class="{% if request.path=='/about' %}active{% endif %}">
+                <i class="fa-solid fa-circle-info"></i> About Us
+            </a>
+            
+            <a href="/profile" class="{% if request.path=='/profile' %}active{% endif %}">
+                <i class="fa-solid fa-circle-user"></i>
+            </a>
+
+        </nav>
+    </div>
+    {%block body%}{%endblock%}
+</body>
+</html>

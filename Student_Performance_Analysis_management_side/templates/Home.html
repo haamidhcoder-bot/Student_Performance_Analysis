@@ -1,0 +1,178 @@
+{% extends "base.html" %}
+
+{%block head%}
+<title>Home</title>
+{%endblock%}
+
+{%block body%}
+{% if log %}
+<div id="loginModal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>Code</span>
+      <span class="modal-close" onclick="closeLoginModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      Logged in through <strong>{{ user }}</strong>
+    </div>
+    <div class="modal-footer">
+      <button type="button" onclick="closeLoginModal()">OK</button>
+    </div>
+  </div>
+</div>
+<script>
+  function closeLoginModal() {
+    document.getElementById('loginModal').style.display = 'none';
+  }
+</script>
+<style>
+  .modal-overlay {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.4);
+    display: flex; align-items:center; justify-content:center;
+    z-index: 1000;
+  }
+  .modal-box {
+    background:#fff; border-radius:8px; width:340px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    font-family: inherit;
+  }
+  .modal-header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 16px;
+    background:#e7f0fa; border-radius:8px 8px 0 0; font-weight:600;
+    color:#0d3b66;
+  }
+  .modal-close { cursor:pointer; font-size:18px; line-height:1; }
+  .modal-close:hover { color:#c0392b; }
+  .modal-body { padding:22px 18px; color:#333; }
+  .modal-footer { text-align:right; padding:12px 16px; border-top:1px solid #eee; }
+  .modal-footer button {
+    background:#1565c0; color:#fff; border:none; padding:8px 20px;
+    border-radius:4px; cursor:pointer; font-weight:600;
+  }
+  .modal-footer button:hover { background:#0d47a1; }
+</style>
+{% endif %}
+<div id="sendResultsValidationModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span>Missing information</span>
+      <span class="modal-close" onclick="closeSendResultsValidationModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      Please select both a subject and an exam before sending results.
+    </div>
+    <div class="modal-footer">
+      <button type="button" onclick="closeSendResultsValidationModal()">OK</button>
+    </div>
+  </div>
+</div>
+<script>
+  function closeSendResultsValidationModal() {
+    document.getElementById('sendResultsValidationModal').style.display = 'none';
+  }
+</script>
+<style>
+  .modal-overlay {
+    position: fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.4);
+    display: flex; align-items:center; justify-content:center;
+    z-index: 1000;
+  }
+  .modal-box {
+    background:#fff; border-radius:8px; width:340px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    font-family: inherit;
+  }
+  .modal-header {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:12px 16px;
+    background:#e7f0fa; border-radius:8px 8px 0 0; font-weight:600;
+    color:#0d3b66;
+  }
+  .modal-close { cursor:pointer; font-size:18px; line-height:1; }
+  .modal-close:hover { color:#c0392b; }
+  .modal-body { padding:22px 18px; color:#333; }
+  .modal-footer { text-align:right; padding:12px 16px; border-top:1px solid #eee; }
+  .modal-footer button {
+    background:#1565c0; color:#fff; border:none; padding:8px 20px;
+    border-radius:4px; cursor:pointer; font-weight:600;
+  }
+  .modal-footer button:hover { background:#0d47a1; }
+</style>
+<div class="container">
+    <form action="/show_students" method="POST">
+      <div class="card">
+          <div style="display:flex; align-items:center; justify-content:space-between;">
+              <h2 style="margin-bottom:0;">
+                  {% if class_value %}Class {{ class_value }}{% if sec %} - Section {{ sec }}{% endif %} {% else %}Select a class{% endif %}
+            </h2>
+        </div>
+
+        <div class="filter-bar">
+            <div class="field">
+                <label for="class">Class</label>
+                <input type="number" name="class" id="class" placeholder="Enter class" min="1" max="12" value="{{ class_value or 1 }}">
+            </div>
+            <div class="field">
+                <label for="sec">Section</label>
+            <select name="section" id="sec">
+                <option value="A" {% if sec == "A" %}selected{% endif %}>A</option>
+                <option value="B" {% if sec == "B" %}selected{% endif %}>B</option>
+                <option value="C" {% if sec == "C" %}selected{% endif %}>C</option>
+            </select>
+        </div>
+
+
+        <div class="field" style="flex: 0 0 auto;">
+            <button type="submit" style="margin-top:0;">
+                Show Students
+            </button>
+        </div>
+        </div>
+
+        {% if not class_value and not sec%}
+        <h4>Enter a class above to get started.</h4>
+        {% elif class_value%}
+        <div class="table-toolbar">
+            <input type="text" id="searchSub" class="table-search" placeholder="Search by name, roll no, marks, or result" oninput="filterTable('tableSub','searchSub')">
+            <div class="sort-controls">
+                <select id="sortKeySub">
+                    <option value="roll">Sort by roll no</option>
+
+                </select>
+                <button type="button" class="sort-btn" id="sortBtnSub" onclick="sortTable('tableSub','sortKeySub','sortBtnSub')">
+                    <svg class="sort-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="M5 12l7-7 7 7"/></svg>
+                    Sort
+                </button>
+            </div>
+        </div>
+        <table id="tableSub">
+            <thead>
+                <tr>
+                    <th>Roll no</th>
+                    <th>Student name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for stu in students %}
+                    <tr data-roll="{{ stu.roll_no }}"  data-name="{{ stu.student_name|lower }}">
+                        <td data-label="Roll no" >{{ stu.roll_no }}</td>
+                        <td data-label="Student name" >{{ stu.student_name }}</td>
+                        <td data-label="Actions" class="actions">
+                            <a href="#">Edit</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <h4>There are no data to show</h4>
+        {% endif %}
+      </div>
+    </form>
+    </div>
+
+{%endblock%}
