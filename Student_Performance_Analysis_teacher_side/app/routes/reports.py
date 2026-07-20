@@ -7,6 +7,7 @@ from app.models import Mark
 from app.services.graph_service import generate_graph
 from app.services.leaderboard_service import compute_leaderboard
 from app.extensions import db
+from app.utils.Logged_in import login_required
 
 reports_bp = Blueprint("reports", __name__)
 
@@ -25,6 +26,7 @@ def graph(roll_no: int, subject: str, exam_id: int):
 
 
 @reports_bp.route("/leaderboard", methods=["GET", "POST"], endpoint="leaderboard")
+@login_required
 def leaderboard():
     exa = request.form.get("exam", "")
     class_input = request.form.get("class", "").strip()

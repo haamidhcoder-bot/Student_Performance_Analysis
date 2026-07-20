@@ -2,11 +2,13 @@ from flask import Blueprint, render_template, redirect, request, session, curren
 
 from app.extensions import db
 from app.models import Mark
+from app.utils.Logged_in import login_required
 
 marks_bp = Blueprint("marks", __name__)
 
 
 @marks_bp.route("/edit/<int:roll_no>/<string:subject>/<int:exam_id>", methods=["POST", "GET"], endpoint="edit")
+@login_required
 def edit(roll_no: int, subject: str, exam_id: int):
     mark = Mark.query.filter(
         Mark.roll_no == roll_no,

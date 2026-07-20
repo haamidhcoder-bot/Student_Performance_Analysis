@@ -6,5 +6,4 @@ sqlalchemy
 pymysql
 mysql.connector
 flask_sqlalchemy
-pandas
 seaborn

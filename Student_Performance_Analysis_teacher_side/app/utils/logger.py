@@ -14,7 +14,7 @@ def setup_logger(app):
     )
 
     handler = RotatingFileHandler(
-        "app.log",
+        "Teacher App.log",
         maxBytes=1024 * 1024,  # 1 MB
         backupCount=5
     )

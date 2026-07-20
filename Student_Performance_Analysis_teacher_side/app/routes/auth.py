@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, redirect, request, session, url_for, current_app
 
+from werkzeug.security import generate_password_hash, check_password_hash
 from app.models import Teacher
 
 auth_bp = Blueprint("auth", __name__)
@@ -9,17 +10,15 @@ auth_bp = Blueprint("auth", __name__)
 def login_page():
     if request.method == "POST" and not session.get("logged_in", ""):
         user_n = request.form.get("username", "")
-        pass_n = request.form.get("password", "")
+        pass_n =request.form.get("password", "")
         session["username"] = user_n
-        session["password"] = pass_n
         remember = request.form.get("remember", "")
         teachers = Teacher.query.filter(
-            Teacher.Gmail == user_n,
-            Teacher.password == pass_n
+            Teacher.Gmail == user_n
         ).first()
         if remember and teachers:
             session["logged_in"] = True
-        if teachers:
+        if teachers and check_password_hash(teachers.password,pass_n):#for working of password hashing the password saved in database should be in the same hashing
             current_app.logger.info(f"{session.get('username', '')} logged in")
             return render_template(
                 "Home.html",

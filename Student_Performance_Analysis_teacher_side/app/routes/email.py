@@ -3,6 +3,7 @@ from flask import Blueprint, render_template, request, session, jsonify, current
 from config import dict_details
 from app.models import Student, Exam, Mark
 from app.services.email_service import email
+from app.utils.Logged_in import login_required
 
 email_bp = Blueprint("email", __name__)
 
@@ -34,6 +35,7 @@ def error_page():
 
 
 @email_bp.route("/send_results", methods=["POST"], endpoint="send_results")
+@login_required
 def send_results():
     """Called via fetch() from loading.html. Returns JSON, not HTML,
     so the loading page's JS can decide where to redirect next."""
